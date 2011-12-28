@@ -11,6 +11,32 @@ object Calculation {
   var efficiency_percent = 75.0
   var sugarLoss_percent = 100.0
   
+ // source of bitterness calculations: http://www.realbeer.com/hops/FAQ.html#units
+ def ragerIBU(alphaAcid_perUnit: Double, amount_grams: Double, water_liters: Double, gravity: Double, boil_minutes: Double): Double = {
+    val gravityAdjustment = scala.math.max(0.0, ((gravity - 1.050) / 0.2))
+    val utilizationPercent = 18.11 + 13.86 * scala.math.tanh((boil_minutes-31.32)/18.27)
+    
+    ((amount_grams * utilizationPercent / 100.0 * alphaAcid_perUnit * 1000) / ( water_liters * (1 + gravityAdjustment)))
+  }
+  
+  //TODO add tinseth and garetz and a way to switch between them for fun
+  
+  def getIbuFromHops(hops: NodeSeq, gravity: Double, water_liters: Double): Double = {
+    hops.foldLeft(0.0)((bitterness: Double, node: Node) => {
+      var weight_gram: Double = 0.0
+      var alphaAcid_perUnit: Double = 0.0
+      var boil_minutes: Double = 0.0
+      try {
+        weight_gram = (node \ "AMOUNT").text.toString.toDouble
+        alphaAcid_perUnit = ((node \ "ALPHA").text.toString.toDouble) / 100.0
+        boil_minutes = (node \ "TIME").text.toString.toDouble
+      } catch {
+        case _ : Exception => {}
+      }
+      
+      bitterness + ragerIBU(alphaAcid_perUnit, weight_gram, water_liters, gravity, boil_minutes)
+    })
+  }
  
   def getSugarFromFermentables(fermentables: NodeSeq): Double = {
     fermentables.foldLeft(0.0)((sugar:Double, node: Node) => {
