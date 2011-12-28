@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fermentable_dialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <Spinner
+        android:id="@+id/fermentableNameSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+    
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+                        
+            <TextView
+                android:id="@+id/fermentableYeildTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Yield"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	        <EditText
+	            android:id="@+id/fermentableYeildNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+	  
+	    </TableRow>
+	    
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/fermentableColorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color (SRM)"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	      	        
+	        <EditText
+	            android:id="@+id/fermentableColorNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+        </TableRow>
+        
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/fermentableAmountTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Amount"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	      	        
+	        <EditText
+	            android:id="@+id/fermentableAmountNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+        </TableRow>
+            
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/fermentableNotesTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Fermentable notes:" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1" >
+
+        <Button
+            android:id="@+id/fermentableAddItemButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Add Fermentable" />
+
+        <Button
+            android:id="@+id/fermentableCancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Cancel" />
+
+    </LinearLayout>
+
+</LinearLayout>

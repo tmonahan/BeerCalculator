@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ScrollView android:id="@+id/scroll" 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical" >
+    <TableLayout
+        android:id="@+id/fermentableTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:stretchColumns="1">
+
+        <TableRow
+            android:id="@+id/fermentableTitleRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/fermentableTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fermentables:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/fermentablesAddButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_column="2"
+                android:text="Add" />
+
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/hopsTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:stretchColumns="1" >
+
+        <TableRow
+            android:id="@+id/hopsTitleRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/hopsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hops / Spices:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/hopsAddButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_column = "3"
+                android:text="Add" />
+
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/miscTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1" >
+
+        <TableRow
+            android:id="@+id/miscTitleRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/miscTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Misc:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/miscAddButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="Add" />
+
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/yeastTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1" >
+
+        <TableRow
+            android:id="@+id/yeastTitleRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/yeastTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Yeast:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/yeastAddButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="Add" />
+
+        </TableRow>
+    </TableLayout>
+    </LinearLayout>
+    </ScrollView>
+
+    <TableLayout
+        android:id="@+id/recipeStatsTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:shrinkColumns="1,2"
+        android:stretchColumns="2,3"  >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/ogName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="OG: " />
+            
+            <TextView
+                android:id="@+id/ogValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="1.000" />
+
+            <com.joyousruction.beercalc.TargetedProgressBar
+                android:id="@+id/ogTargetedProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="3dp"/>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/fgName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="FG: " />
+            
+            <TextView
+                android:id="@+id/fgValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="1.000" />
+
+            <com.joyousruction.beercalc.TargetedProgressBar
+                android:id="@+id/fgTargetedProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="3dp"/>
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/buName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="BU: " />
+
+            <TextView
+                android:id="@+id/buValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="00.0" />
+            
+            <com.joyousruction.beercalc.TargetedProgressBar
+                android:id="@+id/buTargetedProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="3dp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/buguName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="BU/GU: " />
+            
+            <TextView
+                android:id="@+id/buguValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="0.0%" />
+
+            <com.joyousruction.beercalc.TargetedProgressBar
+                android:id="@+id/buguTargetedProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="3dp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/colorName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="Color:" />
+            
+            <TextView
+                android:id="@+id/colorValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="0 SRM" />
+
+            <com.joyousruction.beercalc.TargetedProgressBar
+                android:id="@+id/colorTargetedProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="3dp" />
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

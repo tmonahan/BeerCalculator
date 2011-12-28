@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/hops_dialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <Spinner
+        android:id="@+id/hopsNameSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+    
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+                        
+            <TextView
+                android:id="@+id/hopsAlphaTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alpha Acid (percent)"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	        <EditText
+	            android:id="@+id/hopsAlphaNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+	  
+	    </TableRow>
+	    
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/hopsMinutesTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Boil Time (minutes)"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	      	        
+	        <EditText
+	            android:id="@+id/hopsMinutesNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+        </TableRow>
+        
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/hopsAmountTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Amount"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	      	        
+	        <EditText
+	            android:id="@+id/hopsAmountNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+        </TableRow>
+            
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/hopsNotesTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Hop notes:" />
+
+    <TextView
+        android:id="@+id/hopsSubstitutesTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Hop substitutes:" />
+    
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1" >
+
+        <Button
+            android:id="@+id/hopsAddItemButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Add Hops" />
+
+        <Button
+            android:id="@+id/hopsCancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Cancel" />
+
+    </LinearLayout>
+
+</LinearLayout>

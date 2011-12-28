@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, Main!</string>
+    <string name="app_name">BeerCalculator</string>
+    <string name="Load"></string>
+    <string name="load">Load</string>
+    <string name="startNewRecipe">Start New Recipe</string>
+    <string name="loadRecipe">Load Recipe</string>
+    <string name="importRecipe">Import Recipe</string>
+    <string name="exportRecipe">Export Recipe</string>
+    <string name="createRecipe">Create Recipe</string>
+
+</resources>
