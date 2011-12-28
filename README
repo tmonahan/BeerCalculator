@@ -1,0 +1,3 @@
+BrewCalculator is a project to help me learn android programming, and currently there are a lot of places where this code could be refactored, cleaned up, and optimised. Please bear with me as this is still very much a work in progress.
+
+The database, algorithms, calculations, and some of the look and feel of this app are inspired by or come from the BrewTarget open source project, see http://brewtarget.sourceforge.net/ for more details.
