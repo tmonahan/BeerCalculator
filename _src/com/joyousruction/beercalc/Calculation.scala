@@ -20,7 +20,13 @@ object Calculation {
     ((amount_grams * utilizationPercent / 100.0 * alphaAcid_perUnit * 1000) / ( water_liters * (1 + gravityAdjustment)))
   }
   
-  //TODO add tinseth and garetz and a way to switch between them for fun
+  def tinsethIBU(alphaAcid_perUnit: Double, amount_grams: Double, water_liters: Double, gravity: Double, boil_minutes: Double): Double = {
+    val bignessFactor = 1.65 * scala.math.pow(0.000125, (gravity - 1))
+    val boilTimeFactor = (1 - scala.math.exp(-0.04 * boil_minutes))/4.15
+    ((bignessFactor * boilTimeFactor) * (amount_grams * alphaAcid_perUnit * 1000) / water_liters)
+  }
+  
+  //TODO add garetz and a way to switch between them for fun
   
   //TODO add source of SRM calculations
   def mcuToSRM_morey(mcu: Double): Double = {
@@ -48,7 +54,7 @@ object Calculation {
         case _ : Exception => {}
       }
       
-      bitterness + ragerIBU(alphaAcid_perUnit, weight_gram, water_liters, gravity, boil_minutes)
+      bitterness + tinsethIBU(alphaAcid_perUnit, weight_gram, water_liters, gravity, boil_minutes)
     })
   }
  
