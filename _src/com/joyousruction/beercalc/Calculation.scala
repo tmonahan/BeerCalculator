@@ -6,6 +6,7 @@ object Calculation {
 
   //Constants
   val sucroseDensity_kgL = 1.587
+  val kg_l_to_lb_g = 8.34538
   
   //User defined variables, default values are stored here.
   var efficiency_percent = 75.0
@@ -20,6 +21,19 @@ object Calculation {
   }
   
   //TODO add tinseth and garetz and a way to switch between them for fun
+  
+  //TODO add source of SRM calculations
+  def mcuToSRM_morey(mcu: Double): Double = {
+    1.4922 * scala.math.pow(mcu, 0.6859)
+  }
+  
+  def mcuToSRM_daniel(mcu: Double): Double = {
+    0.2 * mcu + 8.4
+  }
+  
+  def mcuToSRM_mosher(mcu: Double): Double = {
+    0.3 * mcu + 4.7
+  }
   
   def getIbuFromHops(hops: NodeSeq, gravity: Double, water_liters: Double): Double = {
     hops.foldLeft(0.0)((bitterness: Double, node: Node) => {
@@ -57,6 +71,22 @@ object Calculation {
       }
       sugar + weight_kg * yield_unit * efficiency
     })
+  }
+  
+  def getSRMFromFermentables(fermentables: NodeSeq, water_liters: Double): Double = {
+    val mcu = fermentables.foldLeft(0.0)((color: Double, node: Node) => {
+            
+      var weight_kg: Double = 0.0
+      var srm: Double = 0.0
+      try {
+        weight_kg = (node \ "AMOUNT").text.toString.toDouble
+        srm = (node \ "COLOR").text.toString.toDouble
+      } catch {
+        case _ : Exception => {}
+      }
+      color + (srm * kg_l_to_lb_g * weight_kg / water_liters)
+    })
+    mcuToSRM_morey(mcu)
   }
   
   def getDegreesPlato(sugar_kg: Double, batch_l: Double): Double = {

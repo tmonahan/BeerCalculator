@@ -39,6 +39,7 @@ class RecipeStats extends Activity {
   var degrees_plato = 0.0
   var sg = 1.000
   var bitterness_ibu = 0.0
+  var color_srm = 0.0
 
   lazy val fermentablesAddButton = findViewById(R.id.fermentablesAddButton).asInstanceOf[Button]
   lazy val fermentableTable = findViewById(R.id.fermentableTable).asInstanceOf[TableLayout]
@@ -158,6 +159,7 @@ class RecipeStats extends Activity {
   private def updateAll() = {
     updateGravity()
     updateBitterness()
+    updateColor()
   }
 
   private def updateGravity() = {
@@ -174,6 +176,13 @@ class RecipeStats extends Activity {
 
     bitternessUnitsTPB.setProgress(bitterness_ibu.toInt)
     bitternessUnitsValue.setText("%.1f".format(bitterness_ibu))
+  }
+  
+  private def updateColor() = {
+    color_srm = Calculation.getSRMFromFermentables(currentFermentables, liters)
+    
+    colorTPB.setProgress((color_srm * 10.0).toInt)
+    colorValue.setText("%.1f".format(color_srm))
   }
 
   private def addFermentableToTable(v: View, node: FermentableSpinnerNode) = {
@@ -272,13 +281,17 @@ class RecipeStats extends Activity {
 
         addButton.setOnClickListener((v: View) => {
 
-          val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[TextView]
+          val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[EditText]
+          val colorTextView = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
+          val yieldTextView = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
           if (amountTextView.getText().toString != "") {
             val fermentableContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[FermentableSpinnerNode].node)
             val node: NodeSeq = <FERMENTABLE>{
               (fermentableContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
                 myNode match {
                   case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountTextView.getText().toString.toDouble) }</AMOUNT>
+                  case <COLOR>{ ns @ _* }</COLOR> => B ++ <COLOR>{ "%.5e".format(colorTextView.getText().toString.toDouble) }</COLOR>
+                  case <YIELD>{ ns @ _* }</YIELD> => B ++ <YIELD>{"%.5e".format(yieldTextView.getText().toString.toDouble) }</YIELD>
                   case _ => B ++ myNode
                 }
               })
