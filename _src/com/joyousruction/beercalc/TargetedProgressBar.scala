@@ -3,12 +3,18 @@ package com.joyousruction.beercalc
 import android.util.AttributeSet
 import android.widget.ProgressBar
 import android.content.Context
+import android.content.res.XmlResourceParser
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.graphics.Paint
+import android.graphics.PorterDuff.Mode._
 import android.graphics.RectF
 import android.os.Handler
 import android.view.View
 import android.view.View.MeasureSpec
+
 
 import scala.Math
 
@@ -58,7 +64,16 @@ final class TargetedProgressBar(context: Context, attrs: AttributeSet, defStyle:
     maxTargetProgress = newMaxTargetProgress
     maxRect = progressRect(maxTargetProgress)
   }
-  
+  override def setProgress(newProgress: Int) {
+    if(newProgress >= minTargetProgress && newProgress <= maxTargetProgress) {
+      this.getProgressDrawable().asInstanceOf[LayerDrawable].getDrawable(2).setColorFilter(0xFF10FFFF.toInt, android.graphics.PorterDuff.Mode.MULTIPLY)
+    } else {
+      this.getProgressDrawable().asInstanceOf[LayerDrawable].getDrawable(2).setColorFilter(null)
+    }
+
+    super.setProgress(newProgress)
+
+  }
   override def onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     val width: Int = chooseSize(widthMeasureSpec,getSuggestedMinimumWidth())
     val height: Int = chooseSize(heightMeasureSpec, getSuggestedMinimumHeight())
@@ -73,6 +88,7 @@ final class TargetedProgressBar(context: Context, attrs: AttributeSet, defStyle:
   override def getSuggestedMinimumWidth(): Int = {
     super.getSuggestedMinimumWidth()
   }
+
   
   //TODO - add extra size to allow for target bars extending beyond progress bar
   override def getSuggestedMinimumHeight(): Int = {
