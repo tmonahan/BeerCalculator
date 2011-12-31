@@ -38,8 +38,10 @@ class RecipeStats extends Activity {
   var sugar_kg = 0.0
   var degrees_plato = 0.0
   var sg = 1.000
+  var fg = 1.000
   var bitterness_ibu = 0.0
   var color_srm = 0.0
+  var estimatedAttenuation = 0.0
 
   lazy val fermentablesAddButton = findViewById(R.id.fermentablesAddButton).asInstanceOf[Button]
   lazy val fermentableTable = findViewById(R.id.fermentableTable).asInstanceOf[TableLayout]
@@ -183,9 +185,13 @@ class RecipeStats extends Activity {
     sugar_kg = Calculation.getSugarFromFermentables(currentFermentables)
     degrees_plato = Calculation.getDegreesPlato(sugar_kg, liters)
     sg = Calculation.getSGfromPlato(degrees_plato)
+    estimatedAttenuation = Calculation.getAttenuationFromYeast(currentYeast)
+    fg = (sg - 1.0) * (1.0 - (estimatedAttenuation/100.0)) + 1.0
 
     originalGravityTPB.setProgress(((sg - 1.0) * 1000).toInt)
     originalGravityValue.setText("%.3f".format(sg))
+    finalGravityTPB.setProgress(((fg-1.0) * 1000).toInt)
+    finalGravityValue.setText("%.3f".format(fg))
   }
 
   private def updateBitterness() = {
@@ -577,6 +583,7 @@ class RecipeStats extends Activity {
             val spinnerNode = new YeastSpinnerNode(node.last)
             currentYeast = currentYeast ++ spinnerNode.node
             addYeastToTable(v, spinnerNode)
+            updateGravity()
           }
           dialog.dismiss()
         })

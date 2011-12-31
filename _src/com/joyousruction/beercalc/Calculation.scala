@@ -41,6 +41,22 @@ object Calculation {
     0.3 * mcu + 4.7
   }
   
+  def getAttenuationFromYeast(yeast: NodeSeq): Double = {
+    var maxAttenuation = yeast.foldLeft(0.0)((attenuation: Double, node: Node) => {
+      var myAttenuation = 0.0
+      try {
+        myAttenuation = (node \ "ATTENUATION").text.toString.toDouble
+      }
+      scala.math.max(myAttenuation, attenuation)
+    })
+    
+    if( !yeast.isEmpty && maxAttenuation == 0.0){
+      maxAttenuation = 75
+    }
+    
+    maxAttenuation
+  }
+  
   def getIbuFromHops(hops: NodeSeq, gravity: Double, water_liters: Double): Double = {
     hops.foldLeft(0.0)((bitterness: Double, node: Node) => {
       var weight_gram: Double = 0.0
