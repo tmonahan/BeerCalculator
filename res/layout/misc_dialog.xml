@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/hops_dialog"
+    android:id="@+id/misc_dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp" >
 
     <Spinner
-        android:id="@+id/hopsNameSpinner"
+        android:id="@+id/miscNameSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
@@ -24,17 +24,16 @@
             android:layout_height="wrap_content" >
                         
             <TextView
-                android:id="@+id/hopsAlphaTextView"
+                android:id="@+id/miscTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alpha Acid (percent)"
+                android:text="Type"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 	        <EditText
-	            android:id="@+id/hopsAlphaNumberPicker"
+	            android:id="@+id/miscTypeEditText"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_weight="1" 
-	            android:inputType="numberDecimal" >
+	            android:layout_weight="1" >
 	        </EditText>
 	  
 	    </TableRow>
@@ -45,14 +44,14 @@
             android:layout_height="wrap_content" >
             
             <TextView
-                android:id="@+id/hopsMinutesTextView"
+                android:id="@+id/miscTimeTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Boil Time (minutes)"
+                android:text="Time (minutes)"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 	      	        
 	        <EditText
-	            android:id="@+id/hopsMinutesNumberPicker"
+	            android:id="@+id/miscTimeNumberPicker"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1" 
@@ -66,14 +65,14 @@
             android:layout_height="wrap_content" >
             
             <TextView
-                android:id="@+id/hopsAmountTextView"
+                android:id="@+id/miscAmountTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Amount"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 	      	        
 	        <EditText
-	            android:id="@+id/hopsAmountNumberPicker"
+	            android:id="@+id/miscAmountNumberPicker"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1" 
@@ -84,18 +83,18 @@
     </TableLayout>
 
     <TextView
-        android:id="@+id/hopsNotesTextView"
+        android:id="@+id/miscNotesTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Hop notes:" />
+        android:text="Notes:" />
 
     <TextView
-        android:id="@+id/hopsSubstitutesTextView"
+        android:id="@+id/miscUseTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Hop substitutes:" />
+        android:text="Use for:" />
     
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -105,14 +104,14 @@
         android:layout_weight="1" >
 
         <Button
-            android:id="@+id/hopsAddItemButton"
+            android:id="@+id/miscAddItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Add Hops" />
+            android:text="Add Misc" />
 
         <Button
-            android:id="@+id/hopsCancelButton"
+            android:id="@+id/miscCancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

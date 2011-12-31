@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/hops_dialog"
+    android:id="@+id/yeast_dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp" >
 
     <Spinner
-        android:id="@+id/hopsNameSpinner"
+        android:id="@+id/yeastNameSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
@@ -24,18 +24,16 @@
             android:layout_height="wrap_content" >
                         
             <TextView
-                android:id="@+id/hopsAlphaTextView"
+                android:id="@+id/yeastFormName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alpha Acid (percent)"
+                android:text="Form: "
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-	        <EditText
-	            android:id="@+id/hopsAlphaNumberPicker"
+	        <TextView
+	            android:id="@+id/yeastFormTextView"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_weight="1" 
-	            android:inputType="numberDecimal" >
-	        </EditText>
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 	  
 	    </TableRow>
 	    
@@ -45,19 +43,17 @@
             android:layout_height="wrap_content" >
             
             <TextView
-                android:id="@+id/hopsMinutesTextView"
+                android:id="@+id/yeastLaboratoryName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Boil Time (minutes)"
+                android:text="Laboratory: "
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-	      	        
-	        <EditText
-	            android:id="@+id/hopsMinutesNumberPicker"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_weight="1" 
-	            android:inputType="numberDecimal" >
-	        </EditText>
+	      	      
+	       <TextView
+                android:id="@+id/yeastLaboratoryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium" />  
         </TableRow>
         
         <TableRow
@@ -66,14 +62,35 @@
             android:layout_height="wrap_content" >
             
             <TextView
-                android:id="@+id/hopsAmountTextView"
+                android:id="@+id/yeastAttenuationTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Attenuation"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	      	        
+	        <EditText
+	            android:id="@+id/yeastAttenuationNumberPicker"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" 
+	            android:inputType="numberDecimal" >
+	        </EditText>
+        </TableRow>
+        
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/yeastAmountTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Amount"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 	      	        
 	        <EditText
-	            android:id="@+id/hopsAmountNumberPicker"
+	            android:id="@+id/yeastAmountNumberPicker"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1" 
@@ -84,18 +101,18 @@
     </TableLayout>
 
     <TextView
-        android:id="@+id/hopsNotesTextView"
+        android:id="@+id/yeastNotesTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Hop notes:" />
+        android:text="Yeast notes:" />
 
     <TextView
-        android:id="@+id/hopsSubstitutesTextView"
+        android:id="@+id/yeastFlocculationTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Hop substitutes:" />
+        android:text="Flocculation: " />
     
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -105,14 +122,14 @@
         android:layout_weight="1" >
 
         <Button
-            android:id="@+id/hopsAddItemButton"
+            android:id="@+id/yeastAddItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Add Hops" />
+            android:text="Add Yeast" />
 
         <Button
-            android:id="@+id/hopsCancelButton"
+            android:id="@+id/yeastCancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
