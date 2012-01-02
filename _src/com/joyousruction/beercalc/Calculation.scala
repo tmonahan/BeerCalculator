@@ -41,6 +41,13 @@ object Calculation {
     0.3 * mcu + 4.7
   }
   
+  def convertLbsKg(lbs: Double): Double = { 0.45359237 * lbs }
+  def convertKgLbs(kg: Double): Double = { 2.20462262 * kg }
+  
+  def convertOzG(oz: Double): Double = { 28.3495231 * oz }
+  def convertGOz(g: Double): Double = { 0.035273961 * g }
+  
+  
   def getAttenuationFromYeast(yeast: NodeSeq): Double = {
     var maxAttenuation = yeast.foldLeft(0.0)((attenuation: Double, node: Node) => {
       var myAttenuation = 0.0

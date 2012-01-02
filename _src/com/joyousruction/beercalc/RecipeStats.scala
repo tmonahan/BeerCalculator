@@ -214,7 +214,7 @@ class RecipeStats extends Activity {
     val amount = (node.node \ "AMOUNT").text.toDouble
     val amountText: TextView = new TextView(this)
 
-    amountText.setText("%.3f".format(amount))
+    amountText.setText("%.3f".format(Calculation.convertKgLbs(amount)))
     amountText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
 
     text.setText((node.node \ "NAME").text.toString())
@@ -239,7 +239,7 @@ class RecipeStats extends Activity {
     val time = (node.node \ "TIME").text.toDouble
     val timeText: TextView = new TextView(this)
 
-    amountText.setText("%.2f".format(amount))
+    amountText.setText("%.2f".format(Calculation.convertGOz(amount)))
     timeText.setText("%.0f".format(time))
     
     text.setText((node.node \ "NAME").text.toString())
@@ -368,7 +368,7 @@ class RecipeStats extends Activity {
             val node: NodeSeq = <FERMENTABLE>{
               (fermentableContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
                 myNode match {
-                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountTextView.getText().toString.toDouble) }</AMOUNT>
+                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertLbsKg(amountTextView.getText().toString.toDouble)) }</AMOUNT>
                   case <COLOR>{ ns @ _* }</COLOR> => B ++ <COLOR>{ "%.5e".format(colorTextView.getText().toString.toDouble) }</COLOR>
                   case <YIELD>{ ns @ _* }</YIELD> => B ++ <YIELD>{"%.5e".format(yieldTextView.getText().toString.toDouble) }</YIELD>
                   case _ => B ++ myNode
@@ -438,7 +438,7 @@ class RecipeStats extends Activity {
             val node: NodeSeq = <HOP>{
               (hopContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
                 myNode match {
-                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountNumberPicker.getText().toString.toDouble) }</AMOUNT>
+                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble)) }</AMOUNT>
                   case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(minutesNumberPicker.getText().toString.toDouble) }</TIME>
                   case <ALPHA>{ ns @ _* }</ALPHA> => B ++ <ALPHA>{ "%.5e".format(alphaNumberPicker.getText().toString.toDouble) }</ALPHA>
                   case _ => B ++ myNode
