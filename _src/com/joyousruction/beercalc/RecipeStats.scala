@@ -85,7 +85,7 @@ class RecipeStats extends Activity {
 
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.recipestats)
+    setContentView(R.layout.recipeformulation)
 
     currentRecipe = Database.getCurrentRecipe
 

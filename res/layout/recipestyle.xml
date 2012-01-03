@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:stretchColumns="0,1,2">
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Min" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Max" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/ogStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Original Gravity" />
+
+            <TextView
+                android:id="@+id/ogStyleMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1.000" />
+
+            <TextView
+                android:id="@+id/ogStyleMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1.000" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/fgStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Final Gravity" />
+
+            <TextView
+                android:id="@+id/fgStyleMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1.000" />
+
+            <TextView
+                android:id="@+id/fgStyleMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1.000" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/ibuStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bitterness (IBU)" />
+
+            <TextView
+                android:id="@+id/ibuStyleMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0" />
+
+            <TextView
+                android:id="@+id/ibuStyleMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/colorStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Color (SRM)" />
+
+            <TextView
+                android:id="@+id/colorStyleMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0" />
+
+            <TextView
+                android:id="@+id/colorStyleMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/abvStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alcohol by Volume" />
+
+            <TextView
+                android:id="@+id/abvStyleMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0%" />
+
+            <TextView
+                android:id="@+id/abvStyleMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0%" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+            <TextView
+                android:id="@+id/carbonationStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Carbonation (Volumes CO2)" />
+
+            <TextView
+                android:id="@+id/carbonationStyleMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0" />
+
+            <TextView
+                android:id="@+id/carbonationStyleMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0.0" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/notesStyleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notes:" />
+
+    <TextView
+        android:id="@+id/profileStyleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Profile:" />
+
+    <TextView
+        android:id="@+id/ingredientsStyleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ingredients: " />
+
+    <TextView
+        android:id="@+id/examplesStyleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Examples: " />
+
+</LinearLayout>
