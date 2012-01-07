@@ -696,14 +696,14 @@ class RecipeStats extends FragmentActivity {
       lazy val carbonationMax = v.findViewById(R.id.carbonationStyleMax).asInstanceOf[TextView]
       
       try{
-        notesText.setText("Notes:\n" + (currentStyle \ "NOTES").text.toString())
-        profileText.setText("Profile:\n" + (currentStyle \ "PROFILE").text.toString())
-        ingredientsText.setText("Ingredients:\n" + (currentStyle \ "INGREDIENTS").text.toString())
-        examplesText.setText("Examples:\n" + (currentStyle \ "EXAMPLES").text.toString())
-        ogMin.setText((currentStyle \ "OG_MIN").text.toDouble.toString())
-        ogMax.setText((currentStyle \ "OG_MAX").text.toDouble.toString())
-        fgMin.setText((currentStyle \ "FG_MIN").text.toDouble.toString())
-        fgMax.setText((currentStyle \ "FG_MAX").text.toDouble.toString())
+        notesText.setText((currentStyle \ "NOTES").text.toString())
+        profileText.setText((currentStyle \ "PROFILE").text.toString())
+        ingredientsText.setText((currentStyle \ "INGREDIENTS").text.toString())
+        examplesText.setText((currentStyle \ "EXAMPLES").text.toString())
+        ogMin.setText("%.3f".format((currentStyle \ "OG_MIN").text.toDouble))
+        ogMax.setText("%.3f".format((currentStyle \ "OG_MAX").text.toDouble))
+        fgMin.setText("%.3f".format((currentStyle \ "FG_MIN").text.toDouble))
+        fgMax.setText("%.3f".format((currentStyle \ "FG_MAX").text.toDouble))
         ibuMin.setText((currentStyle \ "IBU_MIN").text.toDouble.toString())
         ibuMax.setText((currentStyle \ "IBU_MAX").text.toDouble.toString())
         colorMin.setText((currentStyle \ "COLOR_MIN").text.toDouble.toString())

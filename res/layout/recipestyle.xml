@@ -17,28 +17,56 @@
             android:orientation="vertical" >
 
             <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notes:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
                 android:id="@+id/notesStyleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Notes:" />
+                android:text="" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/profileStyleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile:" />
+                android:text="" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ingredients:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/ingredientsStyleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ingredients: " />
+                android:text="" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Examples:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/examplesStyleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Examples: " />
+                android:text="" />
         </LinearLayout>
     </ScrollView>
 
