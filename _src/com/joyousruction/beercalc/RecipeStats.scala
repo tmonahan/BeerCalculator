@@ -32,7 +32,7 @@ class RecipeStats extends FragmentActivity {
   val WRAP_CONTENT = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
   // define the ViewPager stuff here
-  val NUM_PAGES = 1
+  val NUM_PAGES = 2
   var mAdapter: MyFragmentAdapter = null
   var mPager: ViewPager = null
 
@@ -115,7 +115,10 @@ class RecipeStats extends FragmentActivity {
       NUM_PAGES
     }
     override def getItem(position: Int): Fragment = {
-      RecipeFormulationFragment
+      position match {
+        case 0 => RecipeFormulationFragment
+        case 1 => RecipeStyleFragment
+      }
     }
   }
 
@@ -664,6 +667,57 @@ class RecipeStats extends FragmentActivity {
     }
 
     dialog
+  }
+
+  object RecipeStyleFragment extends Fragment {
+    override def onCreate(savedInstanceState: Bundle) {
+      super.onCreate(savedInstanceState)
+    }
+
+    override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
+      val v: View = inflater.inflate(R.layout.recipestyle, container, false)
+      
+      lazy val notesText = v.findViewById(R.id.notesStyleText).asInstanceOf[TextView]
+      lazy val profileText = v.findViewById(R.id.profileStyleText).asInstanceOf[TextView]
+      lazy val ingredientsText = v.findViewById(R.id.ingredientsStyleText).asInstanceOf[TextView]
+      lazy val examplesText = v.findViewById(R.id.examplesStyleText).asInstanceOf[TextView]
+      
+      lazy val ogMin = v.findViewById(R.id.ogStyleMin).asInstanceOf[TextView]
+      lazy val ogMax = v.findViewById(R.id.ogStyleMax).asInstanceOf[TextView]
+      lazy val fgMin = v.findViewById(R.id.fgStyleMin).asInstanceOf[TextView]
+      lazy val fgMax = v.findViewById(R.id.fgStyleMax).asInstanceOf[TextView]
+      lazy val ibuMin = v.findViewById(R.id.ibuStyleMin).asInstanceOf[TextView]
+      lazy val ibuMax = v.findViewById(R.id.ibuStyleMax).asInstanceOf[TextView]
+      lazy val colorMin = v.findViewById(R.id.colorStyleMin).asInstanceOf[TextView]
+      lazy val colorMax = v.findViewById(R.id.colorStyleMax).asInstanceOf[TextView]
+      lazy val abvMin = v.findViewById(R.id.abvStyleMin).asInstanceOf[TextView]
+      lazy val abvMax = v.findViewById(R.id.abvStyleMax).asInstanceOf[TextView]
+      lazy val carbonationMin = v.findViewById(R.id.carbonationStyleMin).asInstanceOf[TextView]
+      lazy val carbonationMax = v.findViewById(R.id.carbonationStyleMax).asInstanceOf[TextView]
+      
+      try{
+        notesText.setText("Notes:\n" + (currentStyle \ "NOTES").text.toString())
+        profileText.setText("Profile:\n" + (currentStyle \ "PROFILE").text.toString())
+        ingredientsText.setText("Ingredients:\n" + (currentStyle \ "INGREDIENTS").text.toString())
+        examplesText.setText("Examples:\n" + (currentStyle \ "EXAMPLES").text.toString())
+        ogMin.setText((currentStyle \ "OG_MIN").text.toDouble.toString())
+        ogMax.setText((currentStyle \ "OG_MAX").text.toDouble.toString())
+        fgMin.setText((currentStyle \ "FG_MIN").text.toDouble.toString())
+        fgMax.setText((currentStyle \ "FG_MAX").text.toDouble.toString())
+        ibuMin.setText((currentStyle \ "IBU_MIN").text.toDouble.toString())
+        ibuMax.setText((currentStyle \ "IBU_MAX").text.toDouble.toString())
+        colorMin.setText((currentStyle \ "COLOR_MIN").text.toDouble.toString())
+        colorMax.setText((currentStyle \ "COLOR_MAX").text.toDouble.toString())
+        abvMin.setText((currentStyle \ "ABV_MIN").text.toDouble.toString())
+        abvMax.setText((currentStyle \ "ABV_MAX").text.toDouble.toString())
+        carbonationMin.setText((currentStyle \ "CARB_MIN").text.toDouble.toString())
+        carbonationMax.setText((currentStyle \ "CARB_MAX").text.toDouble.toString())
+      } catch {
+        case e: Exception => {}
+      }
+      
+      v
+    }
   }
 
   implicit def func2OnClickListener(func: (View) => Unit): View.OnClickListener = {
