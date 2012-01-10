@@ -106,6 +106,42 @@ class RecipeStats extends FragmentActivity {
     mPager = findViewById(R.id.recipePager).asInstanceOf[ViewPager]
     mPager.setAdapter(mAdapter)
 
+    currentRecipe = Database.getCurrentRecipe
+
+    currentStyle = currentRecipe \ "STYLE"
+
+  }
+
+  //handle pausing
+  //On pause we want to store the current recipe for future use (like expanding it when this activity opens again)
+  override def onPause() {
+    //ugly non-scala-esqe way of handling the null case, but it will work
+    if (currentRecipe != null) {
+      var style = true
+      var fermentable = true
+      var hop = true
+      var misc = true
+      var yeast = true
+      currentRecipe = (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
+        node match {
+          case <STYLE>{ ns @ _* }</STYLE> => B
+          case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => B
+          case <HOPS>{ ns @ _* }</HOPS> => B
+          case <MISCS>{ ns @ _* }</MISCS> => B
+          case <YEAST>{ ns @ _* }</YEAST> => B
+          case _ => B ++ node
+        }
+        currentRecipe ++ <STYLE> { currentStyle } </STYLE>
+        currentRecipe ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
+        currentRecipe ++ <HOPS> { currentHops } </HOPS>
+        currentRecipe ++ <MISCS> { currentMisc } </MISCS>
+        currentRecipe ++ <YEAST> { currentYeast } </YEAST>
+      })
+
+      Database.currentRecipe = currentRecipe
+    }
+
+    super.onPause()
   }
 
   override def onCreateOptionsMenu(menu: Menu): Boolean = {
@@ -164,10 +200,6 @@ class RecipeStats extends FragmentActivity {
       bitternessGravityValue = v.findViewById(R.id.buguValue).asInstanceOf[TextView]
       colorValue = v.findViewById(R.id.colorValue).asInstanceOf[TextView]
 
-      currentRecipe = Database.getCurrentRecipe
-
-      currentStyle = currentRecipe \ "STYLE"
-
       fermentablesAddButton.setOnClickListener((v: View) => {
         showDialog(FERMENTABLE_DIALOG)
       })
@@ -214,6 +246,14 @@ class RecipeStats extends FragmentActivity {
 
       var minCarbonation = getValue("CARB_MIN", 10.0f, 0, 0)
       var maxCarbonation = getValue("CARB_MAX", 10.0f, 0, 50)
+
+      //make sure views are re-drawn correctly after flipping views
+      currentFermentables.map((node: Node) => addFermentableToTable(v, new FermentableSpinnerNode(node)))
+      currentHops.map((node: Node) => addHopsToTable(v, new HopsSpinnerNode(node)))
+      currentMisc.map((node: Node) => addMiscToTable(v, new MiscSpinnerNode(node)))
+      currentYeast.map((node: Node) => addYeastToTable(v, new YeastSpinnerNode(node)))
+      
+      updateAll()
 
       v
     }
