@@ -2,10 +2,11 @@ package com.joyousruction.beercalc
 
 import scala.xml.{ Elem, Node, NodeSeq, XML }
 
-
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -35,7 +36,6 @@ class RecipeStats extends FragmentActivity {
   val NUM_PAGES = 2
   var mAdapter: MyFragmentAdapter = null
   var mPager: ViewPager = null
-
 
   // defined the dialog numbers here
   val FERMENTABLE_DIALOG = 0
@@ -99,13 +99,20 @@ class RecipeStats extends FragmentActivity {
 
   //create the main page
   override def onCreate(savedInstanceState: Bundle) {
-      super.onCreate(savedInstanceState)
-      setContentView(R.layout.recipeview)
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.recipeview)
 
-      mAdapter = new MyFragmentAdapter(this.getSupportFragmentManager())
-      mPager = findViewById(R.id.recipePager).asInstanceOf[ViewPager]
-      mPager.setAdapter(mAdapter)
+    mAdapter = new MyFragmentAdapter(this.getSupportFragmentManager())
+    mPager = findViewById(R.id.recipePager).asInstanceOf[ViewPager]
+    mPager.setAdapter(mAdapter)
 
+  }
+
+  override def onCreateOptionsMenu(menu: Menu): Boolean = {
+    var inflater: MenuInflater = getMenuInflater()
+    inflater.inflate(R.menu.recipemenu, menu)
+
+    true
   }
 
   //fragment adapter controls changes between pages
@@ -116,17 +123,18 @@ class RecipeStats extends FragmentActivity {
     }
     override def getItem(position: Int): Fragment = {
       position match {
-        case 0 => RecipeFormulationFragment
-        case 1 => RecipeStyleFragment
+        case 0 => new RecipeFormulationFragment
+        case 1 => new RecipeStyleFragment
       }
     }
   }
 
   //shows standard recipe formulation view
-  object RecipeFormulationFragment extends Fragment {
+  class RecipeFormulationFragment extends Fragment {
     //This is where one of the fragment classes goes
     override def onCreate(savedInstanceState: Bundle) {
       super.onCreate(savedInstanceState)
+      this.setRetainInstance(true)
     }
 
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
@@ -389,299 +397,315 @@ class RecipeStats extends FragmentActivity {
 
     id match {
       case FERMENTABLE_DIALOG => {
-        dialog.setContentView(R.layout.fermentable_dialog)
-        dialog.setTitle("Add Fermentable:")
-
-        //TODO handle the spinners here
-        val nameSpinner = dialog.findViewById(R.id.fermentableNameSpinner).asInstanceOf[Spinner]
-        //TODO change the EditText boxes to NumberPickers when upgrading to API 11
-        val yieldNumberPicker = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
-        val colorNumberPicker = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
-        val notesTextView = dialog.findViewById(R.id.fermentableNotesTextView).asInstanceOf[TextView]
-
-        val fermentables = Database.getFermentables
-
-        var fermentableNameArray: Array[FermentableSpinnerNode] = new Array(fermentables.length)
-        fermentables.map { node: Node =>
-          new FermentableSpinnerNode(node)
-        }.copyToArray(fermentableNameArray)
-
-        var fermentableStyleArray: ArrayAdapter[FermentableSpinnerNode] = new ArrayAdapter[FermentableSpinnerNode](this, android.R.layout.simple_spinner_item, fermentableNameArray)
-
-        nameSpinner.setAdapter(fermentableStyleArray)
-
-        val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-          val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[FermentableSpinnerNode].node
-
-          yieldNumberPicker.setText((selectedNode \ "YIELD").text.toDouble.toString())
-          colorNumberPicker.setText((selectedNode \ "COLOR").text.toDouble.toString())
-
-          notesTextView.setText("Fermentable Notes:\n" + (selectedNode \ "NOTES").text.toString())
-
-          v.requestLayout()
-          v.invalidate()
-
-        }, (av: AdapterView[_]) => {})
-
-        nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
-
-        //Handle buttons
-        val addButton = dialog.findViewById(R.id.fermentableAddItemButton).asInstanceOf[Button]
-        val cancelButton = dialog.findViewById(R.id.fermentableCancelButton).asInstanceOf[Button]
-
-        addButton.setOnClickListener((v: View) => {
-
-          val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[EditText]
-          val colorTextView = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
-          val yieldTextView = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
-          if (amountTextView.getText().toString != "") {
-            val fermentableContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[FermentableSpinnerNode].node)
-            val node: NodeSeq = <FERMENTABLE>{
-              (fermentableContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
-                myNode match {
-                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertLbsKg(amountTextView.getText().toString.toDouble)) }</AMOUNT>
-                  case <COLOR>{ ns @ _* }</COLOR> => B ++ <COLOR>{ "%.5e".format(colorTextView.getText().toString.toDouble) }</COLOR>
-                  case <YIELD>{ ns @ _* }</YIELD> => B ++ <YIELD>{ "%.5e".format(yieldTextView.getText().toString.toDouble) }</YIELD>
-                  case _ => B ++ myNode
-                }
-              })
-            }</FERMENTABLE>
-            val spinnerNode = new FermentableSpinnerNode(node.last)
-            currentFermentables = currentFermentables ++ spinnerNode.node
-            addFermentableToTable(v, spinnerNode)
-            updateAll()
-          }
-          dialog.dismiss()
-        })
-
-        cancelButton.setOnClickListener((v: View) => {
-          dialog.dismiss()
-        })
-
+        configureFermentableDialog(dialog)
       }
 
       case HOPS_DIALOG => {
-        dialog.setContentView(R.layout.hops_dialog)
-        dialog.setTitle("Add Hop:")
-
-        val nameSpinner = dialog.findViewById(R.id.hopsNameSpinner).asInstanceOf[Spinner]
-        val notesTextView = dialog.findViewById(R.id.hopsNotesTextView).asInstanceOf[TextView]
-        val substitutesTextView = dialog.findViewById(R.id.hopsSubstitutesTextView).asInstanceOf[TextView]
-        lazy val alphaNumberPicker = dialog.findViewById(R.id.hopsAlphaNumberPicker).asInstanceOf[EditText]
-        lazy val minutesNumberPicker = dialog.findViewById(R.id.hopsMinutesNumberPicker).asInstanceOf[EditText]
-        lazy val amountNumberPicker = dialog.findViewById(R.id.hopsAmountNumberPicker).asInstanceOf[EditText]
-
-        val hops = Database.getHops
-
-        var hopsNameArray: Array[HopsSpinnerNode] = new Array(hops.length)
-        hops.map { node: Node =>
-          new HopsSpinnerNode(node)
-        }.copyToArray(hopsNameArray)
-
-        var hopsStyleArray: ArrayAdapter[HopsSpinnerNode] = new ArrayAdapter[HopsSpinnerNode](this, android.R.layout.simple_spinner_item, hopsNameArray)
-
-        nameSpinner.setAdapter(hopsStyleArray)
-
-        val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-          val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[HopsSpinnerNode].node
-
-          alphaNumberPicker.setText((selectedNode \ "ALPHA").text.toDouble.toString())
-          minutesNumberPicker.setText((selectedNode \ "TIME").text.toDouble.toString())
-
-          notesTextView.setText("Hop Notes:\n" + (selectedNode \ "NOTES").text.toString())
-          substitutesTextView.setText("Hop substitutes:\n" + (selectedNode \ "SUBSTITUTES").text.toString())
-
-          v.requestLayout()
-          v.invalidate()
-
-        }, (av: AdapterView[_]) => {})
-
-        nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
-
-        //Handle buttons
-        val addButton = dialog.findViewById(R.id.hopsAddItemButton).asInstanceOf[Button]
-        val cancelButton = dialog.findViewById(R.id.hopsCancelButton).asInstanceOf[Button]
-
-        addButton.setOnClickListener((v: View) => {
-
-          if (amountNumberPicker.getText().toString != "" && minutesNumberPicker.getText().toString != "") {
-            val hopContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[HopsSpinnerNode].node)
-            val node: NodeSeq = <HOP>{
-              (hopContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
-                myNode match {
-                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble)) }</AMOUNT>
-                  case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(minutesNumberPicker.getText().toString.toDouble) }</TIME>
-                  case <ALPHA>{ ns @ _* }</ALPHA> => B ++ <ALPHA>{ "%.5e".format(alphaNumberPicker.getText().toString.toDouble) }</ALPHA>
-                  case _ => B ++ myNode
-                }
-              })
-            }</HOP>
-            val spinnerNode = new HopsSpinnerNode(node.last)
-            currentHops = currentHops ++ spinnerNode.node
-            addHopsToTable(v, spinnerNode)
-            updateBitterness()
-          }
-          dialog.dismiss()
-        })
-
-        cancelButton.setOnClickListener((v: View) => {
-          dialog.dismiss()
-        })
+        configureHopsDialog(dialog)
       }
 
       case MISC_DIALOG => {
-        dialog.setContentView(R.layout.misc_dialog)
-        dialog.setTitle("Add Misc:")
-
-        val nameSpinner = dialog.findViewById(R.id.miscNameSpinner).asInstanceOf[Spinner]
-        lazy val amountNumberPicker = dialog.findViewById(R.id.miscAmountNumberPicker).asInstanceOf[EditText]
-        lazy val timeNumberPicker = dialog.findViewById(R.id.miscTimeNumberPicker).asInstanceOf[EditText]
-        lazy val typeEditText = dialog.findViewById(R.id.miscTypeEditText).asInstanceOf[EditText]
-        val notesTextView = dialog.findViewById(R.id.miscNotesTextView).asInstanceOf[TextView]
-        val useTextView = dialog.findViewById(R.id.miscUseTextView).asInstanceOf[TextView]
-
-        val misc = Database.getMisc
-        var nameArray: Array[MiscSpinnerNode] = new Array(misc.length)
-        misc.map { node: Node =>
-          new MiscSpinnerNode(node)
-        }.copyToArray(nameArray)
-
-        var styleArray: ArrayAdapter[MiscSpinnerNode] = new ArrayAdapter[MiscSpinnerNode](this, android.R.layout.simple_spinner_item, nameArray)
-
-        nameSpinner.setAdapter(styleArray)
-
-        val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-          val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[MiscSpinnerNode].node
-
-          timeNumberPicker.setText((selectedNode \ "TIME").text.toDouble.toString())
-          typeEditText.setText((selectedNode \ "TYPE").text.toString())
-
-          notesTextView.setText("Notes:\n" + (selectedNode \ "NOTES").text.toString())
-          useTextView.setText("Use for:\n" + (selectedNode \ "USE_FOR").text.toString())
-
-          v.requestLayout()
-          v.invalidate()
-
-        }, (av: AdapterView[_]) => {})
-
-        nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
-
-        //Handle buttons
-        val addButton = dialog.findViewById(R.id.miscAddItemButton).asInstanceOf[Button]
-        val cancelButton = dialog.findViewById(R.id.miscCancelButton).asInstanceOf[Button]
-
-        addButton.setOnClickListener((v: View) => {
-          if (amountNumberPicker.getText().toString != "" && timeNumberPicker.getText().toString != "") {
-            val miscContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[MiscSpinnerNode].node)
-            val node: NodeSeq = <MISC>{
-              (miscContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
-                myNode match {
-                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountNumberPicker.getText().toString.toDouble) }</AMOUNT>
-                  case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(timeNumberPicker.getText().toString.toDouble) }</TIME>
-                  case <TYPE>{ ns @ _* }</TYPE> => B ++ <TYPE>{ typeEditText.getText().toString }</TYPE>
-                  case _ => B ++ myNode
-                }
-              })
-            }</MISC>
-            val spinnerNode = new MiscSpinnerNode(node.last)
-            currentMisc = currentMisc ++ spinnerNode.node
-            addMiscToTable(v, spinnerNode)
-          }
-          dialog.dismiss()
-        })
-        cancelButton.setOnClickListener((v: View) => {
-          dialog.dismiss()
-        })
-
+        configureMiscDialog(dialog)
       }
 
       case YEAST_DIALOG => {
-        dialog.setContentView(R.layout.yeast_dialog)
-        dialog.setTitle("Add Yeast:")
-
-        val nameSpinner = dialog.findViewById(R.id.yeastNameSpinner).asInstanceOf[Spinner]
-        lazy val amountNumberPicker = dialog.findViewById(R.id.yeastAmountNumberPicker).asInstanceOf[EditText]
-        lazy val attenuationNumberPicker = dialog.findViewById(R.id.yeastAttenuationNumberPicker).asInstanceOf[EditText]
-        val formTextView = dialog.findViewById(R.id.yeastFormTextView).asInstanceOf[TextView]
-        val laboratoryTextView = dialog.findViewById(R.id.yeastLaboratoryTextView).asInstanceOf[TextView]
-        val notesTextView = dialog.findViewById(R.id.yeastNotesTextView).asInstanceOf[TextView]
-        val flocculationTextView = dialog.findViewById(R.id.yeastFlocculationTextView).asInstanceOf[TextView]
-
-        val yeast = Database.getYeast
-        var nameArray: Array[YeastSpinnerNode] = new Array(yeast.length)
-        yeast.map { node: Node =>
-          new YeastSpinnerNode(node)
-        }.copyToArray(nameArray)
-
-        var styleArray: ArrayAdapter[YeastSpinnerNode] = new ArrayAdapter[YeastSpinnerNode](this, android.R.layout.simple_spinner_item, nameArray)
-
-        nameSpinner.setAdapter(styleArray)
-
-        val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-          val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[YeastSpinnerNode].node
-
-          formTextView.setText((selectedNode \ "FORM").text.toString())
-          laboratoryTextView.setText((selectedNode \ "LABORATORY").text.toString())
-          attenuationNumberPicker.setText((selectedNode \ "ATTENUATION").text.toDouble.toString())
-          amountNumberPicker.setText((selectedNode \ "AMOUNT").text.toDouble.toString())
-
-          notesTextView.setText("Notes:\n" + (selectedNode \ "NOTES").text.toString())
-          flocculationTextView.setText("Flocculation: " + (selectedNode \ "FLOCCULATION").text.toString())
-
-          v.requestLayout()
-          v.invalidate()
-
-        }, (av: AdapterView[_]) => {})
-
-        nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
-        //Handle buttons
-        val addButton = dialog.findViewById(R.id.yeastAddItemButton).asInstanceOf[Button]
-        val cancelButton = dialog.findViewById(R.id.yeastCancelButton).asInstanceOf[Button]
-
-        addButton.setOnClickListener((v: View) => {
-
-          if (amountNumberPicker.getText().toString != "") {
-            val yeastContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[YeastSpinnerNode].node)
-            val node: NodeSeq = <YEAST>{
-              (yeastContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
-                myNode match {
-                  case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountNumberPicker.getText().toString.toDouble) }</AMOUNT>
-                  case <ATTENUATION>{ ns @ _* }</ATTENUATION> => B ++ <ATTENUATION>{ "%.5e".format(attenuationNumberPicker.getText().toString.toDouble) }</ATTENUATION>
-                  case _ => B ++ myNode
-                }
-              })
-            }</YEAST>
-            val spinnerNode = new YeastSpinnerNode(node.last)
-            currentYeast = currentYeast ++ spinnerNode.node
-            addYeastToTable(v, spinnerNode)
-            updateGravity()
-          }
-          dialog.dismiss()
-        })
-
-        cancelButton.setOnClickListener((v: View) => {
-          dialog.dismiss()
-        })
-
+        configureYeastDialog(dialog)
       }
     }
 
     dialog
   }
 
-  object RecipeStyleFragment extends Fragment {
+  def configureFermentableDialog(dialog: Dialog) {
+    dialog.setContentView(R.layout.fermentable_dialog)
+    dialog.setTitle("Add Fermentable:")
+
+    //TODO handle the spinners here
+    val nameSpinner = dialog.findViewById(R.id.fermentableNameSpinner).asInstanceOf[Spinner]
+    //TODO change the EditText boxes to NumberPickers when upgrading to API 11
+    val yieldNumberPicker = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
+    val colorNumberPicker = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
+    val notesTextView = dialog.findViewById(R.id.fermentableNotesTextView).asInstanceOf[TextView]
+
+    val fermentables = Database.getFermentables
+
+    var fermentableNameArray: Array[FermentableSpinnerNode] = new Array(fermentables.length)
+    fermentables.map { node: Node =>
+      new FermentableSpinnerNode(node)
+    }.copyToArray(fermentableNameArray)
+
+    var fermentableStyleArray: ArrayAdapter[FermentableSpinnerNode] = new ArrayAdapter[FermentableSpinnerNode](this, android.R.layout.simple_spinner_item, fermentableNameArray)
+
+    nameSpinner.setAdapter(fermentableStyleArray)
+
+    val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[FermentableSpinnerNode].node
+
+      yieldNumberPicker.setText((selectedNode \ "YIELD").text.toDouble.toString())
+      colorNumberPicker.setText((selectedNode \ "COLOR").text.toDouble.toString())
+
+      notesTextView.setText("Fermentable Notes:\n" + (selectedNode \ "NOTES").text.toString())
+
+      v.requestLayout()
+      v.invalidate()
+
+    }, (av: AdapterView[_]) => {})
+
+    nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
+
+    //Handle buttons
+    val addButton = dialog.findViewById(R.id.fermentableAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.fermentableCancelButton).asInstanceOf[Button]
+
+    addButton.setOnClickListener((v: View) => {
+
+      val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[EditText]
+      val colorTextView = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
+      val yieldTextView = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
+      if (amountTextView.getText().toString != "") {
+        val fermentableContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[FermentableSpinnerNode].node)
+        val node: NodeSeq = <FERMENTABLE>{
+          (fermentableContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
+            myNode match {
+              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertLbsKg(amountTextView.getText().toString.toDouble)) }</AMOUNT>
+              case <COLOR>{ ns @ _* }</COLOR> => B ++ <COLOR>{ "%.5e".format(colorTextView.getText().toString.toDouble) }</COLOR>
+              case <YIELD>{ ns @ _* }</YIELD> => B ++ <YIELD>{ "%.5e".format(yieldTextView.getText().toString.toDouble) }</YIELD>
+              case _ => B ++ myNode
+            }
+          })
+        }</FERMENTABLE>
+        val spinnerNode = new FermentableSpinnerNode(node.last)
+        currentFermentables = currentFermentables ++ spinnerNode.node
+        addFermentableToTable(v, spinnerNode)
+        updateAll()
+      }
+      dialog.dismiss()
+    })
+
+    cancelButton.setOnClickListener((v: View) => {
+      dialog.dismiss()
+    })
+
+  }
+
+  def configureHopsDialog(dialog: Dialog) {
+    dialog.setContentView(R.layout.hops_dialog)
+    dialog.setTitle("Add Hop:")
+
+    val nameSpinner = dialog.findViewById(R.id.hopsNameSpinner).asInstanceOf[Spinner]
+    val notesTextView = dialog.findViewById(R.id.hopsNotesTextView).asInstanceOf[TextView]
+    val substitutesTextView = dialog.findViewById(R.id.hopsSubstitutesTextView).asInstanceOf[TextView]
+    lazy val alphaNumberPicker = dialog.findViewById(R.id.hopsAlphaNumberPicker).asInstanceOf[EditText]
+    lazy val minutesNumberPicker = dialog.findViewById(R.id.hopsMinutesNumberPicker).asInstanceOf[EditText]
+    lazy val amountNumberPicker = dialog.findViewById(R.id.hopsAmountNumberPicker).asInstanceOf[EditText]
+
+    val hops = Database.getHops
+
+    var hopsNameArray: Array[HopsSpinnerNode] = new Array(hops.length)
+    hops.map { node: Node =>
+      new HopsSpinnerNode(node)
+    }.copyToArray(hopsNameArray)
+
+    var hopsStyleArray: ArrayAdapter[HopsSpinnerNode] = new ArrayAdapter[HopsSpinnerNode](this, android.R.layout.simple_spinner_item, hopsNameArray)
+
+    nameSpinner.setAdapter(hopsStyleArray)
+
+    val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[HopsSpinnerNode].node
+
+      alphaNumberPicker.setText((selectedNode \ "ALPHA").text.toDouble.toString())
+      minutesNumberPicker.setText((selectedNode \ "TIME").text.toDouble.toString())
+
+      notesTextView.setText("Hop Notes:\n" + (selectedNode \ "NOTES").text.toString())
+      substitutesTextView.setText("Hop substitutes:\n" + (selectedNode \ "SUBSTITUTES").text.toString())
+
+      v.requestLayout()
+      v.invalidate()
+
+    }, (av: AdapterView[_]) => {})
+
+    nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
+
+    //Handle buttons
+    val addButton = dialog.findViewById(R.id.hopsAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.hopsCancelButton).asInstanceOf[Button]
+
+    addButton.setOnClickListener((v: View) => {
+
+      if (amountNumberPicker.getText().toString != "" && minutesNumberPicker.getText().toString != "") {
+        val hopContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[HopsSpinnerNode].node)
+        val node: NodeSeq = <HOP>{
+          (hopContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
+            myNode match {
+              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble)) }</AMOUNT>
+              case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(minutesNumberPicker.getText().toString.toDouble) }</TIME>
+              case <ALPHA>{ ns @ _* }</ALPHA> => B ++ <ALPHA>{ "%.5e".format(alphaNumberPicker.getText().toString.toDouble) }</ALPHA>
+              case _ => B ++ myNode
+            }
+          })
+        }</HOP>
+        val spinnerNode = new HopsSpinnerNode(node.last)
+        currentHops = currentHops ++ spinnerNode.node
+        addHopsToTable(v, spinnerNode)
+        updateBitterness()
+      }
+      dialog.dismiss()
+    })
+
+    cancelButton.setOnClickListener((v: View) => {
+      dialog.dismiss()
+    })
+  }
+
+  def configureMiscDialog(dialog: Dialog) {
+    dialog.setContentView(R.layout.misc_dialog)
+    dialog.setTitle("Add Misc:")
+
+    val nameSpinner = dialog.findViewById(R.id.miscNameSpinner).asInstanceOf[Spinner]
+    lazy val amountNumberPicker = dialog.findViewById(R.id.miscAmountNumberPicker).asInstanceOf[EditText]
+    lazy val timeNumberPicker = dialog.findViewById(R.id.miscTimeNumberPicker).asInstanceOf[EditText]
+    lazy val typeEditText = dialog.findViewById(R.id.miscTypeEditText).asInstanceOf[EditText]
+    val notesTextView = dialog.findViewById(R.id.miscNotesTextView).asInstanceOf[TextView]
+    val useTextView = dialog.findViewById(R.id.miscUseTextView).asInstanceOf[TextView]
+
+    val misc = Database.getMisc
+    var nameArray: Array[MiscSpinnerNode] = new Array(misc.length)
+    misc.map { node: Node =>
+      new MiscSpinnerNode(node)
+    }.copyToArray(nameArray)
+
+    var styleArray: ArrayAdapter[MiscSpinnerNode] = new ArrayAdapter[MiscSpinnerNode](this, android.R.layout.simple_spinner_item, nameArray)
+
+    nameSpinner.setAdapter(styleArray)
+
+    val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[MiscSpinnerNode].node
+
+      timeNumberPicker.setText((selectedNode \ "TIME").text.toDouble.toString())
+      typeEditText.setText((selectedNode \ "TYPE").text.toString())
+
+      notesTextView.setText("Notes:\n" + (selectedNode \ "NOTES").text.toString())
+      useTextView.setText("Use for:\n" + (selectedNode \ "USE_FOR").text.toString())
+
+      v.requestLayout()
+      v.invalidate()
+
+    }, (av: AdapterView[_]) => {})
+
+    nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
+
+    //Handle buttons
+    val addButton = dialog.findViewById(R.id.miscAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.miscCancelButton).asInstanceOf[Button]
+
+    addButton.setOnClickListener((v: View) => {
+      if (amountNumberPicker.getText().toString != "" && timeNumberPicker.getText().toString != "") {
+        val miscContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[MiscSpinnerNode].node)
+        val node: NodeSeq = <MISC>{
+          (miscContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
+            myNode match {
+              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountNumberPicker.getText().toString.toDouble) }</AMOUNT>
+              case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(timeNumberPicker.getText().toString.toDouble) }</TIME>
+              case <TYPE>{ ns @ _* }</TYPE> => B ++ <TYPE>{ typeEditText.getText().toString }</TYPE>
+              case _ => B ++ myNode
+            }
+          })
+        }</MISC>
+        val spinnerNode = new MiscSpinnerNode(node.last)
+        currentMisc = currentMisc ++ spinnerNode.node
+        addMiscToTable(v, spinnerNode)
+      }
+      dialog.dismiss()
+    })
+    cancelButton.setOnClickListener((v: View) => {
+      dialog.dismiss()
+    })
+
+  }
+
+  def configureYeastDialog(dialog: Dialog) {
+    dialog.setContentView(R.layout.yeast_dialog)
+    dialog.setTitle("Add Yeast:")
+
+    val nameSpinner = dialog.findViewById(R.id.yeastNameSpinner).asInstanceOf[Spinner]
+    lazy val amountNumberPicker = dialog.findViewById(R.id.yeastAmountNumberPicker).asInstanceOf[EditText]
+    lazy val attenuationNumberPicker = dialog.findViewById(R.id.yeastAttenuationNumberPicker).asInstanceOf[EditText]
+    val formTextView = dialog.findViewById(R.id.yeastFormTextView).asInstanceOf[TextView]
+    val laboratoryTextView = dialog.findViewById(R.id.yeastLaboratoryTextView).asInstanceOf[TextView]
+    val notesTextView = dialog.findViewById(R.id.yeastNotesTextView).asInstanceOf[TextView]
+    val flocculationTextView = dialog.findViewById(R.id.yeastFlocculationTextView).asInstanceOf[TextView]
+
+    val yeast = Database.getYeast
+    var nameArray: Array[YeastSpinnerNode] = new Array(yeast.length)
+    yeast.map { node: Node =>
+      new YeastSpinnerNode(node)
+    }.copyToArray(nameArray)
+
+    var styleArray: ArrayAdapter[YeastSpinnerNode] = new ArrayAdapter[YeastSpinnerNode](this, android.R.layout.simple_spinner_item, nameArray)
+
+    nameSpinner.setAdapter(styleArray)
+
+    val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[YeastSpinnerNode].node
+
+      formTextView.setText((selectedNode \ "FORM").text.toString())
+      laboratoryTextView.setText((selectedNode \ "LABORATORY").text.toString())
+      attenuationNumberPicker.setText((selectedNode \ "ATTENUATION").text.toDouble.toString())
+      amountNumberPicker.setText((selectedNode \ "AMOUNT").text.toDouble.toString())
+
+      notesTextView.setText("Notes:\n" + (selectedNode \ "NOTES").text.toString())
+      flocculationTextView.setText("Flocculation: " + (selectedNode \ "FLOCCULATION").text.toString())
+
+      v.requestLayout()
+      v.invalidate()
+
+    }, (av: AdapterView[_]) => {})
+
+    nameSpinner.setOnItemSelectedListener(nameOnSelectListener)
+    //Handle buttons
+    val addButton = dialog.findViewById(R.id.yeastAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.yeastCancelButton).asInstanceOf[Button]
+
+    addButton.setOnClickListener((v: View) => {
+
+      if (amountNumberPicker.getText().toString != "") {
+        val yeastContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[YeastSpinnerNode].node)
+        val node: NodeSeq = <YEAST>{
+          (yeastContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
+            myNode match {
+              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(amountNumberPicker.getText().toString.toDouble) }</AMOUNT>
+              case <ATTENUATION>{ ns @ _* }</ATTENUATION> => B ++ <ATTENUATION>{ "%.5e".format(attenuationNumberPicker.getText().toString.toDouble) }</ATTENUATION>
+              case _ => B ++ myNode
+            }
+          })
+        }</YEAST>
+        val spinnerNode = new YeastSpinnerNode(node.last)
+        currentYeast = currentYeast ++ spinnerNode.node
+        addYeastToTable(v, spinnerNode)
+        updateGravity()
+      }
+      dialog.dismiss()
+    })
+
+    cancelButton.setOnClickListener((v: View) => {
+      dialog.dismiss()
+    })
+  }
+
+  class RecipeStyleFragment extends Fragment {
     override def onCreate(savedInstanceState: Bundle) {
       super.onCreate(savedInstanceState)
+      this.setRetainInstance(true)
     }
 
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
       val v: View = inflater.inflate(R.layout.recipestyle, container, false)
-      
+
       lazy val notesText = v.findViewById(R.id.notesStyleText).asInstanceOf[TextView]
       lazy val profileText = v.findViewById(R.id.profileStyleText).asInstanceOf[TextView]
       lazy val ingredientsText = v.findViewById(R.id.ingredientsStyleText).asInstanceOf[TextView]
       lazy val examplesText = v.findViewById(R.id.examplesStyleText).asInstanceOf[TextView]
-      
+
       lazy val ogMin = v.findViewById(R.id.ogStyleMin).asInstanceOf[TextView]
       lazy val ogMax = v.findViewById(R.id.ogStyleMax).asInstanceOf[TextView]
       lazy val fgMin = v.findViewById(R.id.fgStyleMin).asInstanceOf[TextView]
@@ -694,8 +718,8 @@ class RecipeStats extends FragmentActivity {
       lazy val abvMax = v.findViewById(R.id.abvStyleMax).asInstanceOf[TextView]
       lazy val carbonationMin = v.findViewById(R.id.carbonationStyleMin).asInstanceOf[TextView]
       lazy val carbonationMax = v.findViewById(R.id.carbonationStyleMax).asInstanceOf[TextView]
-      
-      try{
+
+      try {
         notesText.setText((currentStyle \ "NOTES").text.toString())
         profileText.setText((currentStyle \ "PROFILE").text.toString())
         ingredientsText.setText((currentStyle \ "INGREDIENTS").text.toString())
@@ -715,7 +739,7 @@ class RecipeStats extends FragmentActivity {
       } catch {
         case e: Exception => {}
       }
-      
+
       v
     }
   }
