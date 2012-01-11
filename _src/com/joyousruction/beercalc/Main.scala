@@ -1,41 +1,34 @@
 package com.joyousruction.beercalc
 
+import com.joyousruction.scalacompatibility.CompatibleAsyncTask
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Button
 import android.content.Intent
+import android.content.res.Resources
 import R._
 
-class Main extends Activity {   
-  
+class Main extends Activity {
 
-  
-  lazy val loadButton = findViewById(R.id.loadButton).asInstanceOf[Button]
-  lazy val exportButton = findViewById(R.id.exportButton).asInstanceOf[Button]
-  lazy val importButton = findViewById(R.id.importButton).asInstanceOf[Button]
-  lazy val startButton = findViewById(R.id.startButton).asInstanceOf[Button]
-	                
-	override def onCreate(savedInstanceState: Bundle) {
-	        super.onCreate(savedInstanceState)
-	        setContentView(R.layout.main)
-	        
-	          //Force the database to be loaded
-            val res = getResources()
-            Database.init(res)
-	                
+  override def onCreate(savedInstanceState: Bundle) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.main)
 
-	        startButton.setOnClickListener((v: View) => {
-	          startActivity(new Intent(Main.this, classOf[StartNewRecipe]))
-	        })
-	        
-	}
-	
-	implicit def func2OnClickListener(func : (View) => Unit) : View.OnClickListener = {
-	        return new View.OnClickListener() {
-	                override def onClick(v: View) = func(v)
-	        }
-	}
+    new InitDatabase(getResources()).execute()
+  }
+
+  class InitDatabase(res: Resources) extends CompatibleAsyncTask {
+
+    //Force the database to be loaded
+    override def backgroundTask(): java.lang.Long = {
+      Database.init(res)
+      0L
+    }
+
+    override protected def onPostExecute(result: java.lang.Long) = {
+      startActivity(new Intent(Main.this, classOf[StartScreen]))
+    }
+  }
 }
-

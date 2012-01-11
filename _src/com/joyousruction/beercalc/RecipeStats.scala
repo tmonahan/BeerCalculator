@@ -107,8 +107,17 @@ class RecipeStats extends FragmentActivity {
     mPager.setAdapter(mAdapter)
 
     currentRecipe = Database.getCurrentRecipe
-
-    currentStyle = currentRecipe \ "STYLE"
+    
+    (currentRecipe \ "_").map((node: Node) => {
+      node match {
+          case <STYLE>{ ns @ _* }</STYLE> => currentStyle = node
+          case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => currentFermentables = ns
+          case <HOPS>{ ns @ _* }</HOPS> => currentHops = ns
+          case <MISCS>{ ns @ _* }</MISCS> => currentMisc = ns
+          case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = ns
+          case _ => {}
+      }
+    })
 
   }
 
@@ -128,14 +137,14 @@ class RecipeStats extends FragmentActivity {
           case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => B
           case <HOPS>{ ns @ _* }</HOPS> => B
           case <MISCS>{ ns @ _* }</MISCS> => B
-          case <YEAST>{ ns @ _* }</YEAST> => B
+          case <YEASTS>{ ns @ _* }</YEASTS> => B
           case _ => B ++ node
         }
         currentRecipe ++ <STYLE> { currentStyle } </STYLE>
         currentRecipe ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
         currentRecipe ++ <HOPS> { currentHops } </HOPS>
         currentRecipe ++ <MISCS> { currentMisc } </MISCS>
-        currentRecipe ++ <YEAST> { currentYeast } </YEAST>
+        currentRecipe ++ <YEASTS> { currentYeast } </YEASTS>
       })
 
       Database.currentRecipe = currentRecipe

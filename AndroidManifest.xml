@@ -21,6 +21,7 @@
         <activity android:name=".StartNewRecipe" android:screenOrientation="portrait"></activity>
         <activity android:name=".Timer"></activity>
         <activity android:name=".RecipeStats" android:screenOrientation="portrait"></activity>
+        <activity android:name=".StartScreen"></activity>
     </application>
 
 </manifest>
