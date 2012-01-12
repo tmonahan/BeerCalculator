@@ -111,10 +111,10 @@ class RecipeStats extends FragmentActivity {
     (currentRecipe \ "_").map((node: Node) => {
       node match {
           case <STYLE>{ ns @ _* }</STYLE> => currentStyle = node
-          case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => currentFermentables = ns
-          case <HOPS>{ ns @ _* }</HOPS> => currentHops = ns
-          case <MISCS>{ ns @ _* }</MISCS> => currentMisc = ns
-          case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = ns
+          case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => currentFermentables = (node \ "FERMENTABLE")
+          case <HOPS>{ ns @ _* }</HOPS> => currentHops = (node \ "HOP")
+          case <MISCS>{ ns @ _* }</MISCS> => currentMisc = (node \ "MISC")
+          case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = (node \ "YEAST")
           case _ => {}
       }
     })
@@ -339,7 +339,7 @@ class RecipeStats extends FragmentActivity {
   private def addFermentableToTable(v: View, node: FermentableSpinnerNode) = {
     val tr: TableRow = new TableRow(this)
     val text: TextView = new TextView(this)
-    val amount = (node.node \ "AMOUNT").text.toDouble
+    val amount = (node.node \ "AMOUNT").text.toString.toDouble
     val amountText: TextView = new TextView(this)
 
     amountText.setText("%.3f".format(Calculation.convertKgLbs(amount)))
@@ -367,7 +367,7 @@ class RecipeStats extends FragmentActivity {
     val time = (node.node \ "TIME").text.toDouble
     val timeText: TextView = new TextView(this)
 
-    amountText.setText("%.2f".format(Calculation.convertGOz(amount)))
+    amountText.setText("%.2f".format(Calculation.convertGOz(amount*1000.0)))
     timeText.setText("%.0f".format(time))
 
     text.setText((node.node \ "NAME").text.toString())
@@ -586,7 +586,7 @@ class RecipeStats extends FragmentActivity {
         val node: NodeSeq = <HOP>{
           (hopContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
             myNode match {
-              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble)) }</AMOUNT>
+              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble)/1000.0) }</AMOUNT>
               case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(minutesNumberPicker.getText().toString.toDouble) }</TIME>
               case <ALPHA>{ ns @ _* }</ALPHA> => B ++ <ALPHA>{ "%.5e".format(alphaNumberPicker.getText().toString.toDouble) }</ALPHA>
               case _ => B ++ myNode

@@ -70,7 +70,7 @@ object Calculation {
       var alphaAcid_perUnit: Double = 0.0
       var boil_minutes: Double = 0.0
       try {
-        weight_gram = (node \ "AMOUNT").text.toString.toDouble
+        weight_gram = (node \ "AMOUNT").text.toString.toDouble * 1000.0
         alphaAcid_perUnit = ((node \ "ALPHA").text.toString.toDouble) / 100.0
         boil_minutes = (node \ "TIME").text.toString.toDouble
       } catch {
