@@ -139,17 +139,17 @@ class RecipeStats extends FragmentActivity {
 
     true
   }
-  
+
   override def onOptionsItemSelected(item: MenuItem): Boolean = {
     item.getItemId match {
       case R.id.save => {
-        updateDatabaseRecipe
+        updateDatabaseRecipe()
         Database.saveCurrentRecipe(this)
         true
       }
       case _ => { super.onOptionsItemSelected(item) }
     }
-    
+
   }
 
   //fragment adapter controls changes between pages
@@ -262,7 +262,7 @@ class RecipeStats extends FragmentActivity {
 
   private def updateDatabaseRecipe() {
 
-    currentRecipe = (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
+    var recipeItems = (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
       node match {
         case <STYLE>{ ns @ _* }</STYLE> => B
         case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => B
@@ -271,14 +271,15 @@ class RecipeStats extends FragmentActivity {
         case <YEASTS>{ ns @ _* }</YEASTS> => B
         case _ => B ++ node
       }
-      currentRecipe ++ <STYLE> { currentStyle } </STYLE>
-      currentRecipe ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
-      currentRecipe ++ <HOPS> { currentHops } </HOPS>
-      currentRecipe ++ <MISCS> { currentMisc } </MISCS>
-      currentRecipe ++ <YEASTS> { currentYeast } </YEASTS>
     })
+    recipeItems = recipeItems ++ currentStyle //current style is already wrapped in XML tag
+    recipeItems = recipeItems ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
+    recipeItems = recipeItems ++ <HOPS> { currentHops } </HOPS>
+    recipeItems = recipeItems ++ <MISCS> { currentMisc } </MISCS>
+    recipeItems = recipeItems ++ <YEASTS> { currentYeast } </YEASTS>
 
-    Database.currentRecipe = currentRecipe
+    currentRecipe = <RECIPE>{ recipeItems }</RECIPE>
+    Database.setCurrentRecipe(currentRecipe)
 
   }
 
