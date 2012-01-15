@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Button
+import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import R._
@@ -16,14 +17,14 @@ class Main extends Activity {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.main)
 
-    new InitDatabase(getResources()).execute()
+    new InitDatabase(getResources(), this).execute()
   }
 
-  class InitDatabase(res: Resources) extends CompatibleAsyncTask {
+  class InitDatabase(res: Resources, context: Context) extends CompatibleAsyncTask {
 
     //Force the database to be loaded
     override def backgroundTask(): java.lang.Long = {
-      Database.init(res)
+      Database.init(res, context)
       0L
     }
 

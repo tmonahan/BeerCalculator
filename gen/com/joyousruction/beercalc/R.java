@@ -115,6 +115,7 @@ public final class R {
         public static final int recipePager=0x7f06006a;
         public static final int recipeStatsTable=0x7f060039;
         public static final int recipeTable=0x7f06006b;
+        public static final int save=0x7f06008a;
         public static final int scroll=0x7f060029;
         public static final int scroll2=0x7f06004b;
         public static final int spinnerStyles=0x7f060071;

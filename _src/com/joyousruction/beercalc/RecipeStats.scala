@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -107,15 +108,15 @@ class RecipeStats extends FragmentActivity {
     mPager.setAdapter(mAdapter)
 
     currentRecipe = Database.getCurrentRecipe
-    
+
     (currentRecipe \ "_").map((node: Node) => {
       node match {
-          case <STYLE>{ ns @ _* }</STYLE> => currentStyle = node
-          case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => currentFermentables = (node \ "FERMENTABLE")
-          case <HOPS>{ ns @ _* }</HOPS> => currentHops = (node \ "HOP")
-          case <MISCS>{ ns @ _* }</MISCS> => currentMisc = (node \ "MISC")
-          case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = (node \ "YEAST")
-          case _ => {}
+        case <STYLE>{ ns @ _* }</STYLE> => currentStyle = node
+        case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => currentFermentables = (node \ "FERMENTABLE")
+        case <HOPS>{ ns @ _* }</HOPS> => currentHops = (node \ "HOP")
+        case <MISCS>{ ns @ _* }</MISCS> => currentMisc = (node \ "MISC")
+        case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = (node \ "YEAST")
+        case _ => {}
       }
     })
 
@@ -126,28 +127,7 @@ class RecipeStats extends FragmentActivity {
   override def onPause() {
     //ugly non-scala-esqe way of handling the null case, but it will work
     if (currentRecipe != null) {
-      var style = true
-      var fermentable = true
-      var hop = true
-      var misc = true
-      var yeast = true
-      currentRecipe = (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
-        node match {
-          case <STYLE>{ ns @ _* }</STYLE> => B
-          case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => B
-          case <HOPS>{ ns @ _* }</HOPS> => B
-          case <MISCS>{ ns @ _* }</MISCS> => B
-          case <YEASTS>{ ns @ _* }</YEASTS> => B
-          case _ => B ++ node
-        }
-        currentRecipe ++ <STYLE> { currentStyle } </STYLE>
-        currentRecipe ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
-        currentRecipe ++ <HOPS> { currentHops } </HOPS>
-        currentRecipe ++ <MISCS> { currentMisc } </MISCS>
-        currentRecipe ++ <YEASTS> { currentYeast } </YEASTS>
-      })
-
-      Database.currentRecipe = currentRecipe
+      updateDatabaseRecipe
     }
 
     super.onPause()
@@ -158,6 +138,18 @@ class RecipeStats extends FragmentActivity {
     inflater.inflate(R.menu.recipemenu, menu)
 
     true
+  }
+  
+  override def onOptionsItemSelected(item: MenuItem): Boolean = {
+    item.getItemId match {
+      case R.id.save => {
+        updateDatabaseRecipe
+        Database.saveCurrentRecipe(this)
+        true
+      }
+      case _ => { super.onOptionsItemSelected(item) }
+    }
+    
   }
 
   //fragment adapter controls changes between pages
@@ -261,12 +253,35 @@ class RecipeStats extends FragmentActivity {
       currentHops.map((node: Node) => addHopsToTable(v, new HopsSpinnerNode(node)))
       currentMisc.map((node: Node) => addMiscToTable(v, new MiscSpinnerNode(node)))
       currentYeast.map((node: Node) => addYeastToTable(v, new YeastSpinnerNode(node)))
-      
+
       updateAll()
 
       v
     }
   }
+
+  private def updateDatabaseRecipe() {
+
+    currentRecipe = (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
+      node match {
+        case <STYLE>{ ns @ _* }</STYLE> => B
+        case <FERMENTABLES>{ ns @ _* }</FERMENTABLES> => B
+        case <HOPS>{ ns @ _* }</HOPS> => B
+        case <MISCS>{ ns @ _* }</MISCS> => B
+        case <YEASTS>{ ns @ _* }</YEASTS> => B
+        case _ => B ++ node
+      }
+      currentRecipe ++ <STYLE> { currentStyle } </STYLE>
+      currentRecipe ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
+      currentRecipe ++ <HOPS> { currentHops } </HOPS>
+      currentRecipe ++ <MISCS> { currentMisc } </MISCS>
+      currentRecipe ++ <YEASTS> { currentYeast } </YEASTS>
+    })
+
+    Database.currentRecipe = currentRecipe
+
+  }
+
   private def getValue(name: String, scale: Float, offset: Int, defaultValue: Int): Int = {
     try {
       ((currentStyle \ name).text.toFloat * scale).round - offset
@@ -367,7 +382,7 @@ class RecipeStats extends FragmentActivity {
     val time = (node.node \ "TIME").text.toDouble
     val timeText: TextView = new TextView(this)
 
-    amountText.setText("%.2f".format(Calculation.convertGOz(amount*1000.0)))
+    amountText.setText("%.2f".format(Calculation.convertGOz(amount * 1000.0)))
     timeText.setText("%.0f".format(time))
 
     text.setText((node.node \ "NAME").text.toString())
@@ -586,7 +601,7 @@ class RecipeStats extends FragmentActivity {
         val node: NodeSeq = <HOP>{
           (hopContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
             myNode match {
-              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble)/1000.0) }</AMOUNT>
+              case <AMOUNT>{ ns @ _* }</AMOUNT> => B ++ <AMOUNT>{ "%.5e".format(Calculation.convertOzG(amountNumberPicker.getText().toString.toDouble) / 1000.0) }</AMOUNT>
               case <TIME>{ ns @ _* }</TIME> => B ++ <TIME>{ "%.5e".format(minutesNumberPicker.getText().toString.toDouble) }</TIME>
               case <ALPHA>{ ns @ _* }</ALPHA> => B ++ <ALPHA>{ "%.5e".format(alphaNumberPicker.getText().toString.toDouble) }</ALPHA>
               case _ => B ++ myNode
