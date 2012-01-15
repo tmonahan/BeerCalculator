@@ -766,6 +766,7 @@ class RecipeStats extends FragmentActivity {
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
       val v: View = inflater.inflate(R.layout.recipestyle, container, false)
 
+      lazy val nameText = v.findViewById(R.id.nameStyleText).asInstanceOf[TextView]
       lazy val notesText = v.findViewById(R.id.notesStyleText).asInstanceOf[TextView]
       lazy val profileText = v.findViewById(R.id.profileStyleText).asInstanceOf[TextView]
       lazy val ingredientsText = v.findViewById(R.id.ingredientsStyleText).asInstanceOf[TextView]
@@ -785,6 +786,7 @@ class RecipeStats extends FragmentActivity {
       lazy val carbonationMax = v.findViewById(R.id.carbonationStyleMax).asInstanceOf[TextView]
 
       try {
+        nameText.setText((currentStyle \ "NAME").text.toString())
         notesText.setText((currentStyle \ "NOTES").text.toString())
         profileText.setText((currentStyle \ "PROFILE").text.toString())
         ingredientsText.setText((currentStyle \ "INGREDIENTS").text.toString())
