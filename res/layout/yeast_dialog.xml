@@ -96,6 +96,13 @@
 	            android:layout_weight="1" 
 	            android:inputType="numberDecimal" >
 	        </EditText>
+	        
+            <TextView
+                android:id="@+id/yeastAmountUnitsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="unknown"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
         </TableRow>
             
     </TableLayout>
