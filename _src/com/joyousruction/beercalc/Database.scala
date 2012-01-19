@@ -59,6 +59,12 @@ object Database {
     mashStream.close()
   }
   
+  def importRecipe(is: java.io.InputStream, context: Context) {
+    val data = XML .load(is)
+    currentRecipe = data \\ "RECIPE"
+    saveCurrentRecipe(context)
+  }
+  
   def setCurrentRecipe(recipe: NodeSeq) = {
     currentRecipe = recipe
   }

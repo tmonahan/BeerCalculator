@@ -13,14 +13,16 @@ import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import android.widget.Toast
 import R._
 import java.io.File
+import java.io.FileInputStream
 
 class StartScreen extends Activity {
 
   val EXPORT_DIALOG = 0
   val IMPORT_DIALOG = 1
-  
+
   lazy val loadButton = findViewById(R.id.loadButton).asInstanceOf[Button]
   lazy val exportButton = findViewById(R.id.exportButton).asInstanceOf[Button]
   lazy val importButton = findViewById(R.id.importButton).asInstanceOf[Button]
@@ -31,7 +33,7 @@ class StartScreen extends Activity {
   var recipes: NodeSeq = null
 
   var selectedTableRow: RecipeTableRow = null
-  var recipeToLoad: FileTableRow = null
+  var recipeToImport: FileTableRow = null
   val selectedColor: Int = 0xFFFF5900
   val notSelectedColor: Int = 0xFF000000
 
@@ -91,6 +93,17 @@ class StartScreen extends Activity {
     dialog
   }
 
+  override def onPrepareDialog(id: Int, dialog: Dialog) = {
+
+    id match {
+      case IMPORT_DIALOG => {
+        prepareImportDialog(dialog)
+      }
+      case _ => {}
+    }
+    super.onPrepareDialog(id, dialog)
+  }
+
   def configureExportDialog(dialog: Dialog) {
     dialog.setContentView(R.layout.export_dialog)
     dialog.setTitle("Export Recipe")
@@ -99,13 +112,40 @@ class StartScreen extends Activity {
   def configureImportDialog(dialog: Dialog) {
     dialog.setContentView(R.layout.import_dialog)
     dialog.setTitle("Import Recipe")
+    
+    val okButton = dialog.findViewById(R.id.okImportButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.cancelImportButton).asInstanceOf[Button]
+    
+    cancelButton.setOnClickListener((v:View) => {
+      dialog.dismiss()
+    })
+    
+    okButton.setOnClickListener((v:View) => {
+      if(recipeToImport != null){
+        try{
+          val file = recipeToImport.getFile()
+          val is = new FileInputStream(file)
+          Database.importRecipe(is, this)
+        } catch {
+          case e: Exception => {Toast.makeText(this, "File import failed",Toast.LENGTH_SHORT).show()} //Add failed to open message here
+        }
+      }
+      dialog.dismiss()
+    })
+    
+  }
+
+  def prepareImportDialog(dialog: Dialog) {
+    val table = dialog.findViewById(R.id.importTable).asInstanceOf[TableLayout]
+    table.removeAllViews()
+    recipeToImport = null
 
     val mediaState = Environment.getExternalStorageState()
     if (Environment.MEDIA_MOUNTED.equals(mediaState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(mediaState)) {
       var files = Environment.getExternalStorageDirectory().listFiles().toSeq
       files.map((p: java.io.File) => {
-        if (p.exists() && !p.isHidden()) {
-          addFileToTable(p, dialog.findViewById(R.id.importTable).asInstanceOf[TableLayout])
+        if (p.exists() && p.canRead() && !p.isHidden()) {
+          addFileToTable(p, table)
         }
       })
     }
@@ -120,12 +160,24 @@ class StartScreen extends Activity {
       val dr = new TableRow(this)
       //not sure why the implicit def did not work here...
       val onClick: View.OnClickListener = func2OnClickListener((v: View) => {
-        var subFiles = f.listFiles()
-        subFiles.map((p: java.io.File) => {
-          if (!p.isHidden()) {
-            addFileToTable(p, tl)
+        if (tl.getChildCount() > 1) {
+          tl.removeViews(1, tl.getChildCount - 1)
+        } else {
+          var subFiles = f.listFiles()
+          subFiles.map((p: java.io.File) => {
+            if (p.exists() && p.canRead() && !p.isHidden()) {
+              addFileToTable(p, tl)
+            }
+          })
+          if (tl.getChildCount() == 1) {
+            val emptyRow = new TableRow(this)
+            val emptyText = new TextView(this)
+            emptyText.setText("--- no files to open ---")
+            emptyRow.addView(new View(this))
+            emptyRow.addView(emptyText)
+            tl.addView(emptyRow)
           }
-        })
+        }
       })
       dr.setOnClickListener(onClick)
       //replace with file icon later
@@ -139,13 +191,16 @@ class StartScreen extends Activity {
     } else {
       tr = new FileTableRow(this, f)
       tr.setOnClickListener((v: View) => {
-        if (recipeToLoad != null) {
-          recipeToLoad.setBackgroundColor(notSelectedColor)
+        if (recipeToImport != null) {
+          recipeToImport.setBackgroundColor(notSelectedColor)
         }
-        recipeToLoad = tr.asInstanceOf[FileTableRow]
-        recipeToLoad.setBackgroundColor(selectedColor)
+        recipeToImport = tr.asInstanceOf[FileTableRow]
+        recipeToImport.setBackgroundColor(selectedColor)
       })
     }
+    val indent = new TextView(this)
+    indent.setText("  ")
+    tr.addView(indent, 0)
     t.addView(tr)
   }
 
