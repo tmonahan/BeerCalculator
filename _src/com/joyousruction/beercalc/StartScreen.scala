@@ -126,6 +126,11 @@ class StartScreen extends Activity {
           val file = recipeToImport.getFile()
           val is = new FileInputStream(file)
           Database.importRecipe(is, this)
+          
+          val intent = getIntent()
+          finish()
+          startActivity(intent)
+          
         } catch {
           case e: Exception => {Toast.makeText(this, "File import failed",Toast.LENGTH_SHORT).show()} //Add failed to open message here
         }
