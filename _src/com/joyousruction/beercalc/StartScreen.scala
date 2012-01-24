@@ -78,6 +78,10 @@ class StartScreen extends Activity {
 
   }
 
+  override def onBackPressed() = {
+    moveTaskToBack(true)
+  }
+  
   override def onCreateDialog(id: Int): Dialog = {
     lazy val dialog: Dialog = new Dialog(this)
 
