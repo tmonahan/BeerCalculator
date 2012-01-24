@@ -73,6 +73,8 @@ class RecipeStats extends FragmentActivity {
   var carbonation = 0.0
 
   //recipe fragment buttons etc
+  var recipeName: TextView = null
+  
   var fermentablesAddButton: Button = null
   var fermentableTable: TableLayout = null
 
@@ -177,6 +179,8 @@ class RecipeStats extends FragmentActivity {
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
       val v: View = inflater.inflate(R.layout.recipeformulation, container, false)
 
+      recipeName = v.findViewById(R.id.recipeNameTextView).asInstanceOf[TextView]
+      
       fermentablesAddButton = v.findViewById(R.id.fermentablesAddButton).asInstanceOf[Button]
       fermentableTable = v.findViewById(R.id.fermentableTable).asInstanceOf[TableLayout]
 
@@ -201,6 +205,8 @@ class RecipeStats extends FragmentActivity {
       bitternessGravityValue = v.findViewById(R.id.buguValue).asInstanceOf[TextView]
       colorValue = v.findViewById(R.id.colorValue).asInstanceOf[TextView]
 
+      recipeName.setText((currentRecipe \ "NAME").text.toString)
+      
       fermentablesAddButton.setOnClickListener((v: View) => {
         showDialog(FERMENTABLE_DIALOG)
       })

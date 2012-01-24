@@ -1,134 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ScrollView android:id="@+id/scroll" 
+    <TextView
+        android:id="@+id/recipeNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="vertical" >
-    <TableLayout
-        android:id="@+id/fermentableTable"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:stretchColumns="1">
+        android:layout_weight="1" >
 
-        <TableRow
-            android:id="@+id/fermentableTitleRow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/fermentableTextView"
+            <TableLayout
+                android:id="@+id/fermentableTable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fermentables:"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:stretchColumns="1" >
 
-            <Button
-                android:id="@+id/fermentablesAddButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_column="2"
-                android:text="Add" />
+                <TableRow
+                    android:id="@+id/fermentableTitleRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
 
-        </TableRow>
-    </TableLayout>
+                    <TextView
+                        android:id="@+id/fermentableTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fermentables:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TableLayout
-        android:id="@+id/hopsTable"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        android:stretchColumns="1" >
+                    <Button
+                        android:id="@+id/fermentablesAddButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="2"
+                        android:layout_gravity="right"
+                        android:text="Add" />
+                </TableRow>
+            </TableLayout>
 
-        <TableRow
-            android:id="@+id/hopsTitleRow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/hopsTextView"
+            <TableLayout
+                android:id="@+id/hopsTable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hops / Spices:"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:stretchColumns="1" >
 
-            <Button
-                android:id="@+id/hopsAddButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_column = "3"
-                android:text="Add" />
+                <TableRow
+                    android:id="@+id/hopsTitleRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
 
-        </TableRow>
-    </TableLayout>
+                    <TextView
+                        android:id="@+id/hopsTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hops / Spices:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TableLayout
-        android:id="@+id/miscTable"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1" >
+                    <Button
+                        android:id="@+id/hopsAddButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="3"
+                        android:layout_gravity="right"
+                        android:text="Add" />
+                </TableRow>
+            </TableLayout>
 
-        <TableRow
-            android:id="@+id/miscTitleRow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/miscTextView"
+            <TableLayout
+                android:id="@+id/miscTable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Misc:"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:stretchColumns="1" >
 
-            <Button
-                android:id="@+id/miscAddButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_column = "3"
-                android:text="Add" />
+                <TableRow
+                    android:id="@+id/miscTitleRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
 
-        </TableRow>
-    </TableLayout>
+                    <TextView
+                        android:id="@+id/miscTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Misc:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TableLayout
-        android:id="@+id/yeastTable"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1" >
+                    <Button
+                        android:id="@+id/miscAddButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="3"
+                        android:layout_gravity="right"
+                        android:text="Add" />
+                </TableRow>
+            </TableLayout>
 
-        <TableRow
-            android:id="@+id/yeastTitleRow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/yeastTextView"
+            <TableLayout
+                android:id="@+id/yeastTable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Yeast:"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:stretchColumns="1" >
 
-            <Button
-                android:id="@+id/yeastAddButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_column = "2"
-                android:text="Add" />
+                <TableRow
+                    android:id="@+id/yeastTitleRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
 
-        </TableRow>
-    </TableLayout>
-    </LinearLayout>
+                    <TextView
+                        android:id="@+id/yeastTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Yeast:"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <Button
+                        android:id="@+id/yeastAddButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="2"
+                        android:layout_gravity="right"
+                        android:text="Add" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
     </ScrollView>
 
     <TableLayout
@@ -136,7 +142,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:shrinkColumns="1,2"
-        android:stretchColumns="2,3"  >
+        android:stretchColumns="2,3" >
 
         <TableRow
             android:id="@+id/tableRow1"
@@ -149,7 +155,7 @@
                 android:layout_height="wrap_content"
                 android:padding="3dp"
                 android:text="OG: " />
-            
+
             <TextView
                 android:id="@+id/ogValue"
                 android:layout_width="wrap_content"
@@ -162,7 +168,7 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="3dp"/>
+                android:padding="3dp" />
         </TableRow>
 
         <TableRow
@@ -176,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:padding="3dp"
                 android:text="FG: " />
-            
+
             <TextView
                 android:id="@+id/fgValue"
                 android:layout_width="wrap_content"
@@ -189,8 +195,9 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="3dp"/>
+                android:padding="3dp" />
         </TableRow>
+
         <TableRow
             android:id="@+id/tableRow3"
             android:layout_width="match_parent"
@@ -209,7 +216,7 @@
                 android:layout_height="wrap_content"
                 android:padding="3dp"
                 android:text="00.0" />
-            
+
             <com.joyousruction.beercalc.TargetedProgressBar
                 android:id="@+id/buTargetedProgressBar"
                 style="?android:attr/progressBarStyleHorizontal"
@@ -229,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:padding="3dp"
                 android:text="BU/GU: " />
-            
+
             <TextView
                 android:id="@+id/buguValue"
                 android:layout_width="wrap_content"
@@ -256,7 +263,7 @@
                 android:layout_height="wrap_content"
                 android:padding="3dp"
                 android:text="Color:" />
-            
+
             <TextView
                 android:id="@+id/colorValue"
                 android:layout_width="wrap_content"
@@ -271,7 +278,6 @@
                 android:layout_height="wrap_content"
                 android:padding="3dp" />
         </TableRow>
-
     </TableLayout>
 
 </LinearLayout>
