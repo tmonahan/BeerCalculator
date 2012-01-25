@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <WATER>
+  <NAME>Burton on Trent, UK</NAME>
+  <VERSION>1</VERSION>
+  <AMOUNT>2.00000e+01</AMOUNT>
+  <CALCIUM>2.95000e+02</CALCIUM>
+  <BICARBONATE>3.00000e+02</BICARBONATE>
+  <SULFATE>7.25000e+02</SULFATE>
+  <CHLORIDE>2.50000e+01</CHLORIDE>
+  <SODIUM>5.50000e+01</SODIUM>
+  <MAGNESIUM>4.50000e+01</MAGNESIUM>
+  <PH>8.00000e+00</PH>
+  <NOTES>
+Use for distinctive pale ales strongly hopped.  Very hard water accentuates the hops flavor. Example: Bass Ale
+</NOTES>
+ </WATER>

@@ -8,8 +8,13 @@ import android.content.Context
 object Database {
   
   val MODE_WORLD_READABLE = android.content.Context.MODE_WORLD_READABLE
-  
-  val databaseFileName = "database.xml"
+
+  val fermentableFileName = "fermentable.xml"
+  val hopFileName = "hop.xml"
+  val miscFileName = "misc.xml"
+  val yeastFileName = "yeast.xml"
+  val styleFileName = "style.xml"
+    
   val recipeFileName = "recipes.xml"
   val optionsFileName = "options.xml"
   val mashFileName = "mashs.xml"
@@ -33,7 +38,11 @@ object Database {
   def getRecipes: NodeSeq = recipes
   
   def init(resources: Resources, context: Context) = {
-    val databaseStream = resources.getAssets().open(databaseFileName)
+    val fermentableStream = resources.getAssets().open(fermentableFileName)
+    val hopStream = resources.getAssets().open(hopFileName)
+    val miscStream = resources.getAssets().open(miscFileName)
+    val yeastStream = resources.getAssets().open(yeastFileName)
+    val styleStream = resources.getAssets().open(styleFileName)
     val recipeStream = try {
       context.openFileInput(recipeFileName)
     } catch { 
@@ -43,17 +52,20 @@ object Database {
     val mashStream = resources.getAssets().open(mashFileName)
     
     //Handle loading all database information
-    all = XML .load(databaseStream)
-    styles = all \\ "STYLE"
-    fermentables = all \\ "FERMENTABLE"
-    hops = all \\ "HOP"
-    misc = all \\ "MISC"
-    yeast = all \\ "YEAST"
-    
+    fermentables = XML .load(fermentableStream) \ "_"
+    hops = XML .load(hopStream) \ "_"
+    misc = XML .load(miscStream) \ "_"
+    yeast = XML .load(yeastStream) \ "_"
+    styles = XML .load(styleStream) \ "_"
+
     //Load all recipes
     recipes = XML .load(recipeStream)
     
-    databaseStream.close()
+    fermentableStream.close()
+    hopStream.close()
+    miscStream.close()
+    yeastStream.close()
+    styleStream.close()
     recipeStream.close()
     optionsStream.close()
     mashStream.close()
