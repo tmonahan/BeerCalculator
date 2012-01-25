@@ -34,7 +34,10 @@ class RecipeStats extends FragmentActivity {
   val WRAP_CONTENT = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
   // define the ViewPager stuff here
-  val NUM_PAGES = 2
+  val NUM_PAGES = 3
+  val RECIPE_SETTINGS = 0
+  val RECIPE_FORMULATION = 1
+  val RECIPE_STYLE = 2
   var mAdapter: MyFragmentAdapter = null
   var mPager: ViewPager = null
 
@@ -46,7 +49,7 @@ class RecipeStats extends FragmentActivity {
 
   //constants (TODO - make these user defined)
   val gallons = 6.0
-  val liters = Calculation.getLitersFromGallons(gallons)
+  val liters = Calculation.convertGallonsLiters(gallons)
 
   //recipe variables:
   var sugar_kg = 0.0
@@ -108,6 +111,7 @@ class RecipeStats extends FragmentActivity {
     mAdapter = new MyFragmentAdapter(this.getSupportFragmentManager())
     mPager = findViewById(R.id.recipePager).asInstanceOf[ViewPager]
     mPager.setAdapter(mAdapter)
+    mPager.setCurrentItem(RECIPE_FORMULATION, false)
 
     currentRecipe = Database.getCurrentRecipe
 
@@ -162,12 +166,44 @@ class RecipeStats extends FragmentActivity {
     }
     override def getItem(position: Int): Fragment = {
       position match {
-        case 0 => new RecipeFormulationFragment
-        case 1 => new RecipeStyleFragment
+        case RECIPE_SETTINGS => new RecipeSettingsFragment
+        case RECIPE_FORMULATION => new RecipeFormulationFragment
+        case RECIPE_STYLE => new RecipeStyleFragment
       }
     }
   }
 
+  class RecipeSettingsFragment extends Fragment {
+    override def onCreate(savedInstanceState: Bundle) {
+      super.onCreate(savedInstanceState)
+      this.setRetainInstance(true)
+    }
+
+    override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
+      val v: View = inflater.inflate(R.layout.recipesettings, container, false)
+
+      lazy val beerNameText = v.findViewById(R.id.beerNameEditText).asInstanceOf[TextView]
+      lazy val brewerNameText = v.findViewById(R.id.brewerNameEditText).asInstanceOf[TextView]
+      lazy val batchText = v.findViewById(R.id.calculatedBatchSizeTextView).asInstanceOf[TextView]
+      lazy val boilText = v.findViewById(R.id.calculatedBoilSizeTextView).asInstanceOf[TextView]
+      lazy val batchValue = v.findViewById(R.id.targetBatchSizeEditText).asInstanceOf[EditText]
+      lazy val boilValue = v.findViewById(R.id.targetBoilSizeEditText).asInstanceOf[EditText]
+      lazy val efficiencyValue = v.findViewById(R.id.targetEfficiencyEditText).asInstanceOf[EditText]
+
+      try {
+        beerNameText.setText((currentRecipe \ "NAME").text.toString)
+        brewerNameText.setText((currentRecipe \ "BREWER").text.toString)
+        batchValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BATCH_SIZE").text.toDouble)))
+        boilValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BOIL_SIZE").text.toDouble)))
+        efficiencyValue.setText("%f".format((currentRecipe \ "EFFICIENCY").text.toDouble))
+
+      } catch {
+        case e: Exception => {}
+      }
+
+      v
+    }
+  }
   //shows standard recipe formulation view
   class RecipeFormulationFragment extends Fragment {
     //This is where one of the fragment classes goes

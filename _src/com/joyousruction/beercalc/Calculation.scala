@@ -46,7 +46,9 @@ object Calculation {
   
   def convertOzG(oz: Double): Double = { 28.3495231 * oz }
   def convertGOz(g: Double): Double = { 0.035273961 * g }
-  
+    
+  def convertLitersGallons(liters: Double): Double = { 0.264172052 * liters }
+  def convertGallonsLiters(gallons: Double): Double = { 3.78541178 * gallons }
   
   def getAttenuationFromYeast(yeast: NodeSeq): Double = {
     var maxAttenuation = yeast.foldLeft(0.0)((attenuation: Double, node: Node) => {
@@ -127,10 +129,6 @@ object Calculation {
 
   def getSGfromPlato(plato: Double): Double = {
     plato/(258.6-(plato/258.2*227.1)) + 1.0
-  }
-  
-  def getLitersFromGallons(gallons: Double): Double = {
-    gallons * 3.78541178
   }
   
   def setEfficiency(newEfficiency_percent: Double) = {
