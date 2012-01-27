@@ -4,6 +4,8 @@ import scala.xml.{ Elem, Node, NodeSeq, XML }
 
 import android.app.Dialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -47,10 +49,6 @@ class RecipeStats extends FragmentActivity {
   val MISC_DIALOG = 2
   val YEAST_DIALOG = 3
 
-  //constants (TODO - make these user defined)
-  val gallons = 6.0
-  val liters = Calculation.convertGallonsLiters(gallons)
-
   //recipe variables:
   var sugar_kg = 0.0
   var degrees_plato = 0.0
@@ -62,6 +60,9 @@ class RecipeStats extends FragmentActivity {
 
   var currentRecipe: NodeSeq = null
   var currentStyle: NodeSeq = null
+  var currentBatchSize: NodeSeq = NodeSeq.Empty
+  var currentBoilSize: NodeSeq = NodeSeq.Empty
+  var currentEfficiency: NodeSeq = NodeSeq.Empty
 
   var currentFermentables: NodeSeq = NodeSeq.Empty
   var currentHops: NodeSeq = NodeSeq.Empty
@@ -77,7 +78,7 @@ class RecipeStats extends FragmentActivity {
 
   //recipe fragment buttons etc
   var recipeName: TextView = null
-  
+
   var fermentablesAddButton: Button = null
   var fermentableTable: TableLayout = null
 
@@ -122,6 +123,9 @@ class RecipeStats extends FragmentActivity {
         case <HOPS>{ ns @ _* }</HOPS> => currentHops = (node \ "HOP")
         case <MISCS>{ ns @ _* }</MISCS> => currentMisc = (node \ "MISC")
         case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = (node \ "YEAST")
+        case <BATCH_SIZE>{ ns @ _* }</BATCH_SIZE> => currentBatchSize = node
+        case <BOIL_SIZE>{ ns @ _* }</BOIL_SIZE> => currentBoilSize = node
+        case <EFFICIENCY>{ ns @ _* }</EFFICIENCY> => currentEfficiency = node
         case _ => {}
       }
     })
@@ -158,6 +162,15 @@ class RecipeStats extends FragmentActivity {
 
   }
 
+  def refreshAllViews() {
+    try {
+      RecipeFormulationFragment.refreshFragmentViews()
+      updateAll()
+    } catch {
+      case e: Exception => {}
+    }
+  }
+
   //fragment adapter controls changes between pages
   class MyFragmentAdapter(fm: FragmentManager) extends FragmentPagerAdapter(fm) {
 
@@ -167,7 +180,7 @@ class RecipeStats extends FragmentActivity {
     override def getItem(position: Int): Fragment = {
       position match {
         case RECIPE_SETTINGS => new RecipeSettingsFragment
-        case RECIPE_FORMULATION => new RecipeFormulationFragment
+        case RECIPE_FORMULATION => RecipeFormulationFragment
         case RECIPE_STYLE => new RecipeStyleFragment
       }
     }
@@ -182,8 +195,8 @@ class RecipeStats extends FragmentActivity {
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
       val v: View = inflater.inflate(R.layout.recipesettings, container, false)
 
-      lazy val beerNameText = v.findViewById(R.id.beerNameEditText).asInstanceOf[TextView]
-      lazy val brewerNameText = v.findViewById(R.id.brewerNameEditText).asInstanceOf[TextView]
+      lazy val beerNameText = v.findViewById(R.id.beerNameEditText).asInstanceOf[EditText]
+      lazy val brewerNameText = v.findViewById(R.id.brewerNameEditText).asInstanceOf[EditText]
       lazy val batchText = v.findViewById(R.id.calculatedBatchSizeTextView).asInstanceOf[TextView]
       lazy val boilText = v.findViewById(R.id.calculatedBoilSizeTextView).asInstanceOf[TextView]
       lazy val batchValue = v.findViewById(R.id.targetBatchSizeEditText).asInstanceOf[EditText]
@@ -192,20 +205,100 @@ class RecipeStats extends FragmentActivity {
 
       try {
         beerNameText.setText((currentRecipe \ "NAME").text.toString)
-        brewerNameText.setText((currentRecipe \ "BREWER").text.toString)
-        batchValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BATCH_SIZE").text.toDouble)))
-        boilValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BOIL_SIZE").text.toDouble)))
-        efficiencyValue.setText("%f".format((currentRecipe \ "EFFICIENCY").text.toDouble))
-
       } catch {
         case e: Exception => {}
       }
+      try {
+        brewerNameText.setText((currentRecipe \ "BREWER").text.toString)
+      } catch {
+        case e: Exception => {}
+      }
+      try {
+        batchValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BATCH_SIZE").text.toDouble)))
+      } catch {
+        case e: Exception => {}
+      }
+      try {
+        boilValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BOIL_SIZE").text.toDouble)))
+      } catch {
+        case e: Exception => {}
+      }
+      try {
+        efficiencyValue.setText("%f".format((currentRecipe \ "EFFICIENCY").text.toDouble))
+      } catch {
+        case e: Exception => {}
+      }
+
+      beerNameText.addTextChangedListener((e: Editable) => {
+        if (beerNameText.isInputMethodTarget()) {
+          currentRecipe = <RECIPE>{
+            <NAME>{ e.toString() }</NAME> ++ (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
+              node match {
+                case <NAME>{ ns @ _* }</NAME> => B
+                case _ => B ++ node
+              }
+            })
+          }</RECIPE>
+          refreshAllViews()
+        }
+      })
+
+      brewerNameText.addTextChangedListener((e: Editable) => {
+        if (brewerNameText.isInputMethodTarget()) {
+          currentRecipe = <RECIPE>{
+            <BREWER>{ e.toString() }</BREWER> ++ (currentRecipe \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, node: Node) => {
+              node match {
+                case <BREWER>{ ns @ _* }</BREWER> => B
+                case _ => B ++ node
+              }
+            })
+          }</RECIPE>
+        }
+      })
+
+      batchValue.addTextChangedListener((e: Editable) => {
+        if (batchValue.isInputMethodTarget()) {
+          val updatedLiters = try {
+            Calculation.convertGallonsLiters(e.toString().toDouble)
+          } catch {
+            case e: Exception => { 0.0 }
+          }
+          currentBatchSize = <BATCH_SIZE>{ "%.5e".format(updatedLiters) }</BATCH_SIZE>
+          updateDatabaseRecipe()
+        }
+      })
+
+      boilValue.addTextChangedListener((e: Editable) => {
+        if (boilValue.isInputMethodTarget()) {
+          val updatedLiters = try {
+            Calculation.convertGallonsLiters(e.toString().toDouble)
+          } catch {
+            case e: Exception => { 0.0 }
+          }
+          currentBatchSize = <BOIL_SIZE>{ "%.5e".format(updatedLiters) }</BOIL_SIZE>
+          updateDatabaseRecipe()
+        }
+      })
+
+      efficiencyValue.addTextChangedListener((e: Editable) => {
+        if (efficiencyValue.isInputMethodTarget()) {
+          val updatedEfficiency = try {
+            e.toString().toDouble
+          } catch {
+            case e: Exception => { 0.0 }
+          }
+          currentEfficiency = <EFFICIENCY>{ "%.5e".format(updatedEfficiency) }</EFFICIENCY>
+          Calculation.setEfficiency(updatedEfficiency)
+          updateDatabaseRecipe()
+          refreshAllViews()
+        }
+      })
 
       v
     }
   }
   //shows standard recipe formulation view
-  class RecipeFormulationFragment extends Fragment {
+  object RecipeFormulationFragment extends Fragment {
     //This is where one of the fragment classes goes
     override def onCreate(savedInstanceState: Bundle) {
       super.onCreate(savedInstanceState)
@@ -216,7 +309,7 @@ class RecipeStats extends FragmentActivity {
       val v: View = inflater.inflate(R.layout.recipeformulation, container, false)
 
       recipeName = v.findViewById(R.id.recipeNameTextView).asInstanceOf[TextView]
-      
+
       fermentablesAddButton = v.findViewById(R.id.fermentablesAddButton).asInstanceOf[Button]
       fermentableTable = v.findViewById(R.id.fermentableTable).asInstanceOf[TableLayout]
 
@@ -241,8 +334,6 @@ class RecipeStats extends FragmentActivity {
       bitternessGravityValue = v.findViewById(R.id.buguValue).asInstanceOf[TextView]
       colorValue = v.findViewById(R.id.colorValue).asInstanceOf[TextView]
 
-      recipeName.setText((currentRecipe \ "NAME").text.toString)
-      
       fermentablesAddButton.setOnClickListener((v: View) => {
         showDialog(FERMENTABLE_DIALOG)
       })
@@ -259,6 +350,27 @@ class RecipeStats extends FragmentActivity {
         showDialog(YEAST_DIALOG)
       })
 
+      refreshFragmentViewsUsingView(v)
+
+      //make sure views are re-drawn correctly after flipping views
+      currentFermentables.map((node: Node) => addFermentableToTable(v, new FermentableSpinnerNode(node)))
+      currentHops.map((node: Node) => addHopsToTable(v, new HopsSpinnerNode(node)))
+      currentMisc.map((node: Node) => addMiscToTable(v, new MiscSpinnerNode(node)))
+      currentYeast.map((node: Node) => addYeastToTable(v, new YeastSpinnerNode(node)))
+
+      updateAll()
+
+      v
+    }
+
+    def refreshFragmentViews() = {
+      val v = this.getView()
+      refreshFragmentViewsUsingView(v)
+    }
+
+    def refreshFragmentViewsUsingView(v: View) = {
+
+      recipeName.setText((currentRecipe \ "NAME").text.toString)
       //TODO- make this MIN/MAX come from the MIN/MAX in the recipes
       var minOG = getGravity("OG_MIN", 0)
       var maxOG = getGravity("OG_MAX", 200)
@@ -290,15 +402,6 @@ class RecipeStats extends FragmentActivity {
       var minCarbonation = getValue("CARB_MIN", 10.0f, 0, 0)
       var maxCarbonation = getValue("CARB_MAX", 10.0f, 0, 50)
 
-      //make sure views are re-drawn correctly after flipping views
-      currentFermentables.map((node: Node) => addFermentableToTable(v, new FermentableSpinnerNode(node)))
-      currentHops.map((node: Node) => addHopsToTable(v, new HopsSpinnerNode(node)))
-      currentMisc.map((node: Node) => addMiscToTable(v, new MiscSpinnerNode(node)))
-      currentYeast.map((node: Node) => addYeastToTable(v, new YeastSpinnerNode(node)))
-
-      updateAll()
-
-      v
     }
   }
 
@@ -311,14 +414,21 @@ class RecipeStats extends FragmentActivity {
         case <HOPS>{ ns @ _* }</HOPS> => B
         case <MISCS>{ ns @ _* }</MISCS> => B
         case <YEASTS>{ ns @ _* }</YEASTS> => B
+        case <BATCH_SIZE>{ ns @ _* }</BATCH_SIZE> => B
+        case <BOIL_SIZE>{ ns @ _* }</BOIL_SIZE> => B
+        case <EFFICIENCY>{ ns @ _* }</EFFICIENCY> => B
         case _ => B ++ node
       }
     })
+
     recipeItems = recipeItems ++ currentStyle //current style is already wrapped in XML tag
     recipeItems = recipeItems ++ <FERMENTABLES> { currentFermentables } </FERMENTABLES>
     recipeItems = recipeItems ++ <HOPS> { currentHops } </HOPS>
     recipeItems = recipeItems ++ <MISCS> { currentMisc } </MISCS>
     recipeItems = recipeItems ++ <YEASTS> { currentYeast } </YEASTS>
+    recipeItems = recipeItems ++ currentBatchSize
+    recipeItems = recipeItems ++ currentBoilSize
+    recipeItems = recipeItems ++ currentEfficiency
 
     currentRecipe = <RECIPE>{ recipeItems }</RECIPE>
     Database.setCurrentRecipe(currentRecipe)
@@ -361,6 +471,24 @@ class RecipeStats extends FragmentActivity {
     })
   }
 
+  private def boil_liters(): Double = {
+    val liters: Double = try {
+      currentBoilSize.text.toDouble
+    } catch {
+      case e: Exception => { 0.0 }
+    }
+    liters
+  }
+
+  private def batch_liters(): Double = {
+    val liters: Double = try {
+      currentBatchSize.text.toDouble
+    } catch {
+      case e: Exception => { 0.0 }
+    }
+    liters
+  }
+
   private def updateAll() = {
     updateGravity()
     updateBitterness()
@@ -369,7 +497,7 @@ class RecipeStats extends FragmentActivity {
 
   private def updateGravity() = {
     sugar_kg = Calculation.getSugarFromFermentables(currentFermentables)
-    degrees_plato = Calculation.getDegreesPlato(sugar_kg, liters)
+    degrees_plato = Calculation.getDegreesPlato(sugar_kg, batch_liters)
     sg = Calculation.getSGfromPlato(degrees_plato)
     estimatedAttenuation = Calculation.getAttenuationFromYeast(currentYeast)
     fg = (sg - 1.0) * (1.0 - (estimatedAttenuation / 100.0)) + 1.0
@@ -381,14 +509,14 @@ class RecipeStats extends FragmentActivity {
   }
 
   private def updateBitterness() = {
-    bitterness_ibu = Calculation.getIbuFromHops(currentHops, sg, liters)
+    bitterness_ibu = Calculation.getIbuFromHops(currentHops, sg, batch_liters)
 
     bitternessUnitsTPB.setProgress(bitterness_ibu.toInt)
     bitternessUnitsValue.setText("%.1f".format(bitterness_ibu))
   }
 
   private def updateColor() = {
-    color_srm = Calculation.getSRMFromFermentables(currentFermentables, liters)
+    color_srm = Calculation.getSRMFromFermentables(currentFermentables, batch_liters)
 
     colorTPB.setProgress((color_srm * 10.0).toInt)
     colorValue.setText("%.1f".format(color_srm))
@@ -857,6 +985,15 @@ class RecipeStats extends FragmentActivity {
     return new View.OnClickListener() {
       override def onClick(v: View) = func(v)
     }
+  }
+
+  implicit def func2OnTextChangeListner(func: (Editable) => Unit): TextWatcher = {
+    class Temp extends TextWatcher {
+      override def afterTextChanged(e: Editable) = func(e)
+      override def beforeTextChanged(s: CharSequence, a: Int, b: Int, c: Int) = {}
+      override def onTextChanged(s: CharSequence, a: Int, b: Int, c: Int) = {}
+    }
+    return new Temp()
   }
 
   implicit def createOnItemSelectedListener(func: (AdapterView[_], View, Int, Long) => Unit, f: (AdapterView[_]) => Unit): AdapterView.OnItemSelectedListener = {
