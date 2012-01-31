@@ -4,10 +4,54 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TableLayout
-        android:id="@+id/exportTable"
+    <ScrollView
+        android:id="@+id/importScroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </TableLayout>
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/exportTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <EditText
+        android:id="@+id/fileExportNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="recipeToExport.xml"
+        android:padding="3dp" >
+
+    </EditText>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/okExportButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export" />
+
+        <Button
+            android:id="@+id/cancelExportButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+    </LinearLayout>
 
 </LinearLayout>

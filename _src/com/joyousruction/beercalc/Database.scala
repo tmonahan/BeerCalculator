@@ -70,7 +70,19 @@ object Database {
     optionsStream.close()
     mashStream.close()
   }
-  
+
+  def exportRecipe(is: java.io.OutputStream, recipeToExport:NodeSeq) {
+    val recipeWriter = new java.io.BufferedWriter(new java.io.OutputStreamWriter(is))
+    val exportNode = <RECIPES>{recipeToExport}</RECIPES>
+    //write the file
+    try{
+      XML .write(recipeWriter, exportNode, "UTF-8", true, null)
+    } finally {
+      recipeWriter.flush()
+      recipeWriter.close()
+    }
+  }
+
   def importRecipe(is: java.io.InputStream, context: Context) {
     val data = XML .load(is)
     currentRecipe = data \\ "RECIPE"
