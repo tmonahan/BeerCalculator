@@ -22,6 +22,7 @@ import android.widget.TableRow
 import android.widget.TableRow.LayoutParams
 import android.widget.TableRow.LayoutParams._
 import android.widget.TextView
+import android.widget.Toast
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -52,7 +53,8 @@ class RecipeStats extends FragmentActivity {
   //recipe variables:
   var sugar_kg = 0.0
   var degrees_plato = 0.0
-  var sg = 1.000
+  var boil_gravity = 1.000
+  var batch_gravity = 1.000
   var fg = 1.000
   var bitterness_ibu = 0.0
   var color_srm = 0.0
@@ -62,6 +64,7 @@ class RecipeStats extends FragmentActivity {
   var currentStyle: NodeSeq = null
   var currentBatchSize: NodeSeq = NodeSeq.Empty
   var currentBoilSize: NodeSeq = NodeSeq.Empty
+  var currentBoilTime: NodeSeq = NodeSeq.Empty
   var currentEfficiency: NodeSeq = NodeSeq.Empty
 
   var currentFermentables: NodeSeq = NodeSeq.Empty
@@ -75,6 +78,8 @@ class RecipeStats extends FragmentActivity {
   var color = 0.0
   var abv = 0.0
   var carbonation = 0.0
+
+  var maxHopBoilTime = 0.0
 
   //recipe fragment buttons etc
   var recipeName: TextView = null
@@ -125,6 +130,7 @@ class RecipeStats extends FragmentActivity {
         case <YEASTS>{ ns @ _* }</YEASTS> => currentYeast = (node \ "YEAST")
         case <BATCH_SIZE>{ ns @ _* }</BATCH_SIZE> => currentBatchSize = node
         case <BOIL_SIZE>{ ns @ _* }</BOIL_SIZE> => currentBoilSize = node
+        case <BOIL_TIME>{ ns @ _* }</BOIL_TIME> => currentBoilTime = node
         case <EFFICIENCY>{ ns @ _* }</EFFICIENCY> => currentEfficiency = node
         case _ => {}
       }
@@ -165,6 +171,7 @@ class RecipeStats extends FragmentActivity {
   def refreshAllViews() {
     try {
       RecipeFormulationFragment.refreshFragmentViews()
+      RecipeSettingsFragment.refreshFragmentViews()
       updateAll()
     } catch {
       case e: Exception => {}
@@ -179,14 +186,14 @@ class RecipeStats extends FragmentActivity {
     }
     override def getItem(position: Int): Fragment = {
       position match {
-        case RECIPE_SETTINGS => new RecipeSettingsFragment
+        case RECIPE_SETTINGS => RecipeSettingsFragment
         case RECIPE_FORMULATION => RecipeFormulationFragment
         case RECIPE_STYLE => new RecipeStyleFragment
       }
     }
   }
 
-  class RecipeSettingsFragment extends Fragment {
+  object RecipeSettingsFragment extends Fragment {
     override def onCreate(savedInstanceState: Bundle) {
       super.onCreate(savedInstanceState)
       this.setRetainInstance(true)
@@ -201,6 +208,7 @@ class RecipeStats extends FragmentActivity {
       lazy val boilText = v.findViewById(R.id.calculatedBoilSizeTextView).asInstanceOf[TextView]
       lazy val batchValue = v.findViewById(R.id.targetBatchSizeEditText).asInstanceOf[EditText]
       lazy val boilValue = v.findViewById(R.id.targetBoilSizeEditText).asInstanceOf[EditText]
+      lazy val boilTimeValue = v.findViewById(R.id.targetBoilTimeEditText).asInstanceOf[EditText]
       lazy val efficiencyValue = v.findViewById(R.id.targetEfficiencyEditText).asInstanceOf[EditText]
 
       try {
@@ -220,6 +228,11 @@ class RecipeStats extends FragmentActivity {
       }
       try {
         boilValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BOIL_SIZE").text.toDouble)))
+      } catch {
+        case e: Exception => {}
+      }
+      try {
+        boilTimeValue.setText("%.2f".format(Calculation.convertLitersGallons((currentRecipe \ "BOIL_TIME").text.toDouble)))
       } catch {
         case e: Exception => {}
       }
@@ -265,6 +278,7 @@ class RecipeStats extends FragmentActivity {
           }
           currentBatchSize = <BATCH_SIZE>{ "%.5e".format(updatedLiters) }</BATCH_SIZE>
           updateDatabaseRecipe()
+          refreshAllViews()
         }
       })
 
@@ -275,8 +289,22 @@ class RecipeStats extends FragmentActivity {
           } catch {
             case e: Exception => { 0.0 }
           }
-          currentBatchSize = <BOIL_SIZE>{ "%.5e".format(updatedLiters) }</BOIL_SIZE>
+          currentBoilSize = <BOIL_SIZE>{ "%.5e".format(updatedLiters) }</BOIL_SIZE>
           updateDatabaseRecipe()
+          refreshAllViews()
+        }
+      })
+
+      boilTimeValue.addTextChangedListener((e: Editable) => {
+        if (boilTimeValue.isInputMethodTarget()) {
+          val updatedBoilTime = try {
+            (e.toString().toDouble)
+          } catch {
+            case e: Exception => { 0.0 } //This only fails for an empty string (0 minutes)
+          }
+          currentBoilTime = <BOIL_TIME>{ "%.5e".format(updatedBoilTime) }</BOIL_TIME>
+          updateDatabaseRecipe()
+          refreshAllViews()
         }
       })
 
@@ -295,6 +323,16 @@ class RecipeStats extends FragmentActivity {
       })
 
       v
+    }
+    def refreshFragmentViews() {
+      val v = this.getView()
+      val boilText = v.findViewById(R.id.targetBoilTimeEditText).asInstanceOf[EditText]
+      if (boilText.getText().toString.toDouble < maxHopBoilTime) {
+        boilText.setText("%.2f".format(maxHopBoilTime))
+        currentBoilTime = <BOIL_TIME>{ "%.5e".format(maxHopBoilTime) }</BOIL_TIME>
+        updateDatabaseRecipe()
+        refreshAllViews()
+      }
     }
   }
   //shows standard recipe formulation view
@@ -416,6 +454,7 @@ class RecipeStats extends FragmentActivity {
         case <YEASTS>{ ns @ _* }</YEASTS> => B
         case <BATCH_SIZE>{ ns @ _* }</BATCH_SIZE> => B
         case <BOIL_SIZE>{ ns @ _* }</BOIL_SIZE> => B
+        case <BOIL_TIME>{ ns @ _* }</BOIL_TIME> => B
         case <EFFICIENCY>{ ns @ _* }</EFFICIENCY> => B
         case _ => B ++ node
       }
@@ -428,6 +467,7 @@ class RecipeStats extends FragmentActivity {
     recipeItems = recipeItems ++ <YEASTS> { currentYeast } </YEASTS>
     recipeItems = recipeItems ++ currentBatchSize
     recipeItems = recipeItems ++ currentBoilSize
+    recipeItems = recipeItems ++ currentBoilTime
     recipeItems = recipeItems ++ currentEfficiency
 
     currentRecipe = <RECIPE>{ recipeItems }</RECIPE>
@@ -489,6 +529,15 @@ class RecipeStats extends FragmentActivity {
     liters
   }
 
+  private def boil_minutes(): Double = {
+    val minutes: Double = try {
+      currentBoilTime.text.toDouble
+    } catch {
+      case e: Exception => { 0.0 }
+    }
+    minutes
+  }
+
   private def updateAll() = {
     updateGravity()
     updateBitterness()
@@ -498,18 +547,19 @@ class RecipeStats extends FragmentActivity {
   private def updateGravity() = {
     sugar_kg = Calculation.getSugarFromFermentables(currentFermentables)
     degrees_plato = Calculation.getDegreesPlato(sugar_kg, batch_liters)
-    sg = Calculation.getSGfromPlato(degrees_plato)
+    batch_gravity = Calculation.getSGfromPlato(degrees_plato)
+    boil_gravity = (batch_liters / boil_liters) * (batch_gravity - 1.0) + 1.0
     estimatedAttenuation = Calculation.getAttenuationFromYeast(currentYeast)
-    fg = (sg - 1.0) * (1.0 - (estimatedAttenuation / 100.0)) + 1.0
+    fg = (batch_gravity - 1.0) * (1.0 - (estimatedAttenuation / 100.0)) + 1.0
 
-    originalGravityTPB.setProgress(((sg - 1.0) * 1000).toInt)
-    originalGravityValue.setText("%.3f".format(sg))
+    originalGravityTPB.setProgress(((batch_gravity - 1.0) * 1000).toInt)
+    originalGravityValue.setText("%.3f".format(batch_gravity))
     finalGravityTPB.setProgress(((fg - 1.0) * 1000).toInt)
     finalGravityValue.setText("%.3f".format(fg))
   }
 
   private def updateBitterness() = {
-    bitterness_ibu = Calculation.getIbuFromHops(currentHops, sg, batch_liters)
+    bitterness_ibu = Calculation.getIbuFromHops(currentHops, boil_gravity, batch_gravity, boil_liters, batch_liters, boil_minutes())
 
     bitternessUnitsTPB.setProgress(bitterness_ibu.toInt)
     bitternessUnitsValue.setText("%.1f".format(bitterness_ibu))
@@ -569,6 +619,11 @@ class RecipeStats extends FragmentActivity {
     hopsTable.addView(tr, new TableLayout.LayoutParams(
       MATCH_PARENT,
       WRAP_CONTENT))
+
+    if (maxHopBoilTime < time) {
+      maxHopBoilTime = time
+      refreshAllViews()
+    }
 
     v.requestLayout()
     v.invalidate()

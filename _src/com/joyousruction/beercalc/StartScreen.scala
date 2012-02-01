@@ -141,7 +141,7 @@ class StartScreen extends Activity {
         val newFile = new java.io.File(fileDirectory, newFileName)
         val os = new java.io.FileOutputStream(newFile)
 
-        Database.exportRecipe(os, selectedTableRow.getNode())
+        Database.exportRecipe(os, selectedTableRow.getNode(), this)
 
       } catch {
         case e: Exception => { Toast.makeText(this, "File export failed", Toast.LENGTH_SHORT).show() }
@@ -185,6 +185,9 @@ class StartScreen extends Activity {
     val table = dialog.findViewById(R.id.exportTable).asInstanceOf[TableLayout]
     table.removeAllViews()
     recipeToExport = null
+    
+    val exportFileEditText = dialog.findViewById(R.id.fileExportNameEditText).asInstanceOf[EditText]
+    exportFileEditText.setText((selectedTableRow.getNode() \ "NAME").text.toString + ".xml")
 
     val mediaState = Environment.getExternalStorageState()
     if (Environment.MEDIA_MOUNTED.equals(mediaState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(mediaState)) {

@@ -158,6 +158,27 @@
                         android:text="0.00" />
                 </TableRow>
 
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="3dp"
+                        android:text="Boil Time" />
+
+                    <EditText
+                        android:id="@+id/targetBoilTimeEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:padding="3dp" >
+                    </EditText>
+
+                </TableRow>
+                    
                 <TableRow
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" >

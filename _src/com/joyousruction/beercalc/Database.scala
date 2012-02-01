@@ -1,8 +1,9 @@
 package com.joyousruction.beercalc
 
-import scala.xml.{Elem, Node, NodeSeq, XML}
+import scala.xml.{Elem, Node, NodeSeq, PrettyPrinter, XML}
 import android.content.res._
 import android.content.Context
+import android.widget.Toast
 
 
 object Database {
@@ -71,15 +72,19 @@ object Database {
     mashStream.close()
   }
 
-  def exportRecipe(is: java.io.OutputStream, recipeToExport:NodeSeq) {
+  def exportRecipe(is: java.io.OutputStream, recipeToExport:NodeSeq, context: Context) {
     val recipeWriter = new java.io.BufferedWriter(new java.io.OutputStreamWriter(is))
     val exportNode = <RECIPES>{recipeToExport}</RECIPES>
+    val outputString: String = new PrettyPrinter(80,2).format(exportNode)
+    val headerString: String = "<?xml version='1.0' encoding='UTF-8'?>\n"
     //write the file
     try{
-      XML .write(recipeWriter, exportNode, "UTF-8", true, null)
+      recipeWriter.write(headerString, 0, headerString.length())
+      recipeWriter.write(outputString, 0, outputString.length())
     } finally {
       recipeWriter.flush()
       recipeWriter.close()
+      Toast.makeText(context, "File exported successfully", Toast.LENGTH_SHORT).show()
     }
   }
 
