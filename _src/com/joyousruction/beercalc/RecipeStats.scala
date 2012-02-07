@@ -587,7 +587,14 @@ class RecipeStats extends FragmentActivity {
     tr.addView(amountText)
     tr.addView(deleteButton("Delete", () => { currentFermentables = removeNode(currentFermentables, node.node); updateAll() }))
 
-    fermentableTable.addView(tr, new TableLayout.LayoutParams(
+    //Order the ingredients to make editing easier
+    var index = 1;
+    for (i <- 1 until (fermentableTable.getChildCount())) {
+      if(Calculation.convertKgLbs(amount) < (fermentableTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble)) {
+        index = i+1;
+      }
+    }
+    fermentableTable.addView(tr, index, new TableLayout.LayoutParams(
       MATCH_PARENT,
       WRAP_CONTENT))
 
