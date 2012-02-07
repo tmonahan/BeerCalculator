@@ -590,8 +590,8 @@ class RecipeStats extends FragmentActivity {
     //Order the ingredients to make editing easier
     var index = 1;
     for (i <- 1 until (fermentableTable.getChildCount())) {
-      if(Calculation.convertKgLbs(amount) < (fermentableTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble)) {
-        index = i+1;
+      if (Calculation.convertKgLbs(amount) < (fermentableTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble)) {
+        index = i + 1;
       }
     }
     fermentableTable.addView(tr, index, new TableLayout.LayoutParams(
@@ -623,7 +623,14 @@ class RecipeStats extends FragmentActivity {
     tr.addView(amountText)
     tr.addView(deleteButton("Delete", () => { currentHops = removeNode(currentHops, node.node); updateBitterness() }))
 
-    hopsTable.addView(tr, new TableLayout.LayoutParams(
+    var index = 1
+    for (i <- 1 until hopsTable.getChildCount()) {
+      if (time < hopsTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble) {
+        index = i + 1
+      }
+    }
+
+    hopsTable.addView(tr, index, new TableLayout.LayoutParams(
       MATCH_PARENT,
       WRAP_CONTENT))
 
