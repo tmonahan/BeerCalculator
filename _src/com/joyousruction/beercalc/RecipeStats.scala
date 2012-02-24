@@ -605,12 +605,12 @@ class RecipeStats extends FragmentActivity {
   private def addHopsToTable(v: View, node: HopsSpinnerNode) = {
     val tr: TableRow = new TableRow(this)
     val text: TextView = new TextView(this)
-    val amount = (node.node \ "AMOUNT").text.toDouble
+    val amount = Calculation.convertGOz((node.node \ "AMOUNT").text.toDouble * 1000.0)
     val amountText: TextView = new TextView(this)
     val time = (node.node \ "TIME").text.toDouble
     val timeText: TextView = new TextView(this)
 
-    amountText.setText("%.2f".format(Calculation.convertGOz(amount * 1000.0)))
+    amountText.setText("%.2f".format(amount))
     timeText.setText("%.0f".format(time))
 
     text.setText((node.node \ "NAME").text.toString())
@@ -625,7 +625,9 @@ class RecipeStats extends FragmentActivity {
 
     var index = 1
     for (i <- 1 until hopsTable.getChildCount()) {
-      if (time < hopsTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble) {
+      var currentTime = hopsTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble
+      var currentAmount = hopsTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(2).asInstanceOf[TextView].getText().toString.toDouble
+      if (time < currentTime || (time == currentTime && amount < currentAmount)) {
         index = i + 1
       }
     }
