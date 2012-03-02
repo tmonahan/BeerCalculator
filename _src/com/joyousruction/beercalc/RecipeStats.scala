@@ -391,10 +391,10 @@ class RecipeStats extends FragmentActivity {
       refreshFragmentViewsUsingView(v)
 
       //make sure views are re-drawn correctly after flipping views
-      currentFermentables.map((node: Node) => addFermentableToTable(v, new FermentableSpinnerNode(node)))
-      currentHops.map((node: Node) => addHopsToTable(v, new HopsSpinnerNode(node)))
-      currentMisc.map((node: Node) => addMiscToTable(v, new MiscSpinnerNode(node)))
-      currentYeast.map((node: Node) => addYeastToTable(v, new YeastSpinnerNode(node)))
+      currentFermentables.map((node: Node) => addFermentableToTable(v, node))
+      currentHops.map((node: Node) => addHopsToTable(v, node))
+      currentMisc.map((node: Node) => addMiscToTable(v, node))
+      currentYeast.map((node: Node) => addYeastToTable(v, node))
 
       updateAll()
 
@@ -572,20 +572,29 @@ class RecipeStats extends FragmentActivity {
     colorValue.setText("%.1f".format(color_srm))
   }
 
-  private def addFermentableToTable(v: View, node: FermentableSpinnerNode) = {
+  private def addFermentableToTable(v: View, node: Node) = {
     val tr: TableRow = new TableRow(this)
     val text: TextView = new TextView(this)
-    val amount = (node.node \ "AMOUNT").text.toString.toDouble
+    val amount = (node \ "AMOUNT").text.toString.toDouble
     val amountText: TextView = new TextView(this)
 
     amountText.setText("%.3f".format(Calculation.convertKgLbs(amount)))
     amountText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
 
-    text.setText((node.node \ "NAME").text.toString())
+    text.setText((node \ "NAME").text.toString())
 
     tr.addView(text)
     tr.addView(amountText)
-    tr.addView(deleteButton("Delete", () => { currentFermentables = removeNode(currentFermentables, node.node); updateAll() }))
+    tr.addView(deleteButton("Delete", () => { currentFermentables = removeNode(currentFermentables, node); updateAll() }))
+
+    tr.setLongClickable(true)
+    tr.setOnLongClickListener((v: View) => {
+      showDialog(FERMENTABLE_DIALOG)
+      fermentableTable.removeView(tr)
+      currentFermentables = removeNode(currentFermentables, node);
+      updateAll();
+      true
+    })
 
     //Order the ingredients to make editing easier
     var index = 1;
@@ -602,18 +611,18 @@ class RecipeStats extends FragmentActivity {
     v.invalidate()
   }
 
-  private def addHopsToTable(v: View, node: HopsSpinnerNode) = {
+  private def addHopsToTable(v: View, node: Node) = {
     val tr: TableRow = new TableRow(this)
     val text: TextView = new TextView(this)
-    val amount = Calculation.convertGOz((node.node \ "AMOUNT").text.toDouble * 1000.0)
+    val amount = Calculation.convertGOz((node \ "AMOUNT").text.toDouble * 1000.0)
     val amountText: TextView = new TextView(this)
-    val time = (node.node \ "TIME").text.toDouble
+    val time = (node \ "TIME").text.toDouble
     val timeText: TextView = new TextView(this)
 
     amountText.setText("%.2f".format(amount))
     timeText.setText("%.0f".format(time))
 
-    text.setText((node.node \ "NAME").text.toString())
+    text.setText((node \ "NAME").text.toString())
 
     amountText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
     timeText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
@@ -621,7 +630,7 @@ class RecipeStats extends FragmentActivity {
     tr.addView(text)
     tr.addView(timeText)
     tr.addView(amountText)
-    tr.addView(deleteButton("Delete", () => { currentHops = removeNode(currentHops, node.node); updateBitterness() }))
+    tr.addView(deleteButton("Delete", () => { currentHops = removeNode(currentHops, node); updateBitterness() }))
 
     var index = 1
     for (i <- 1 until hopsTable.getChildCount()) {
@@ -645,18 +654,18 @@ class RecipeStats extends FragmentActivity {
     v.invalidate()
   }
 
-  private def addMiscToTable(v: View, node: MiscSpinnerNode) = {
+  private def addMiscToTable(v: View, node: Node) = {
     val tr: TableRow = new TableRow(this)
     val text: TextView = new TextView(this)
-    val amount = (node.node \ "AMOUNT").text.toDouble
+    val amount = (node \ "AMOUNT").text.toDouble
     val amountText: TextView = new TextView(this)
-    val time = (node.node \ "TIME").text.toDouble
+    val time = (node \ "TIME").text.toDouble
     val timeText: TextView = new TextView(this)
 
     amountText.setText("%.2f".format(amount))
     timeText.setText("%.0f".format(time))
 
-    text.setText((node.node \ "NAME").text.toString())
+    text.setText((node \ "NAME").text.toString())
 
     amountText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
     timeText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
@@ -664,7 +673,7 @@ class RecipeStats extends FragmentActivity {
     tr.addView(text)
     tr.addView(timeText)
     tr.addView(amountText)
-    tr.addView(deleteButton("Delete", () => { currentMisc = removeNode(currentMisc, node.node) }))
+    tr.addView(deleteButton("Delete", () => { currentMisc = removeNode(currentMisc, node) }))
 
     miscTable.addView(tr, new TableLayout.LayoutParams(
       MATCH_PARENT,
@@ -674,20 +683,20 @@ class RecipeStats extends FragmentActivity {
     v.invalidate()
   }
 
-  private def addYeastToTable(v: View, node: YeastSpinnerNode) = {
+  private def addYeastToTable(v: View, node: Node) = {
     val tr: TableRow = new TableRow(this)
     val text: TextView = new TextView(this)
-    val amount = (node.node \ "AMOUNT").text.toDouble
+    val amount = (node \ "AMOUNT").text.toDouble
     val amountText: TextView = new TextView(this)
     amountText.setText("%.2f".format(amount))
 
-    text.setText((node.node \ "NAME").text.toString())
+    text.setText((node \ "NAME").text.toString())
 
     amountText.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
 
     tr.addView(text)
     tr.addView(amountText)
-    tr.addView(deleteButton("Delete", () => { currentYeast = removeNode(currentYeast, node.node) }))
+    tr.addView(deleteButton("Delete", () => { currentYeast = removeNode(currentYeast, node) }))
 
     yeastTable.addView(tr, new TableLayout.LayoutParams(
       MATCH_PARENT,
@@ -722,6 +731,27 @@ class RecipeStats extends FragmentActivity {
     dialog
   }
 
+  override def onPrepareDialog(id: Int, dialog: Dialog, args: Bundle) {
+    id match {
+      case FERMENTABLE_DIALOG => {
+        prepareFermentableDialog(dialog, args)
+      }
+
+      case HOPS_DIALOG => {
+        prepareHopsDialog(dialog, args)
+      }
+
+      case MISC_DIALOG => {
+        prepareMiscDialog(dialog, args)
+      }
+
+      case YEAST_DIALOG => {
+        prepareYeastDialog(dialog, args)
+      }
+    }
+    super.onPrepareDialog(id, dialog, args)
+  }
+
   def configureFermentableDialog(dialog: Dialog) {
     dialog.setContentView(R.layout.fermentable_dialog)
     dialog.setTitle("Add Fermentable:")
@@ -735,17 +765,10 @@ class RecipeStats extends FragmentActivity {
 
     val fermentables = Database.getFermentables
 
-    var fermentableNameArray: Array[FermentableSpinnerNode] = new Array(fermentables.length)
-    fermentables.map { node: Node =>
-      new FermentableSpinnerNode(node)
-    }.copyToArray(fermentableNameArray)
-
-    var fermentableStyleArray: ArrayAdapter[FermentableSpinnerNode] = new ArrayAdapter[FermentableSpinnerNode](this, android.R.layout.simple_spinner_item, fermentableNameArray)
-
-    nameSpinner.setAdapter(fermentableStyleArray)
+    nameSpinner.setAdapter(NodeSeqAdapter.getNodeSeqAdapter(this, fermentables, "NAME"))
 
     val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[FermentableSpinnerNode].node
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[NamedNode].node
 
       yieldNumberPicker.setText((selectedNode \ "YIELD").text.toDouble.toString())
       colorNumberPicker.setText((selectedNode \ "COLOR").text.toDouble.toString())
@@ -769,7 +792,7 @@ class RecipeStats extends FragmentActivity {
       val colorTextView = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
       val yieldTextView = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
       if (amountTextView.getText().toString != "") {
-        val fermentableContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[FermentableSpinnerNode].node)
+        val fermentableContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node)
         val node: NodeSeq = <FERMENTABLE>{
           (fermentableContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
             myNode match {
@@ -780,9 +803,9 @@ class RecipeStats extends FragmentActivity {
             }
           })
         }</FERMENTABLE>
-        val spinnerNode = new FermentableSpinnerNode(node.last)
-        currentFermentables = currentFermentables ++ spinnerNode.node
-        addFermentableToTable(v, spinnerNode)
+        val newNode = node.last
+        currentFermentables = currentFermentables ++ newNode
+        addFermentableToTable(v, newNode)
         updateAll()
       }
       dialog.dismiss()
@@ -791,6 +814,20 @@ class RecipeStats extends FragmentActivity {
     cancelButton.setOnClickListener((v: View) => {
       dialog.dismiss()
     })
+
+  }
+
+  def prepareFermentableDialog(dialog: Dialog, args: Bundle) {
+    var myArgs = args
+    if(myArgs == null) {
+      myArgs = new Bundle()
+    }
+    val nameSpinner = dialog.findViewById(R.id.fermentableNameSpinner).asInstanceOf[Spinner]
+    val yieldNumberPicker = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
+    val colorNumberPicker = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
+    val notesTextView = dialog.findViewById(R.id.fermentableNotesTextView).asInstanceOf[TextView]
+    val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[EditText]
+
 
   }
 
@@ -807,17 +844,10 @@ class RecipeStats extends FragmentActivity {
 
     val hops = Database.getHops
 
-    var hopsNameArray: Array[HopsSpinnerNode] = new Array(hops.length)
-    hops.map { node: Node =>
-      new HopsSpinnerNode(node)
-    }.copyToArray(hopsNameArray)
-
-    var hopsStyleArray: ArrayAdapter[HopsSpinnerNode] = new ArrayAdapter[HopsSpinnerNode](this, android.R.layout.simple_spinner_item, hopsNameArray)
-
-    nameSpinner.setAdapter(hopsStyleArray)
+    nameSpinner.setAdapter(NodeSeqAdapter.getNodeSeqAdapter(this, hops, "NAME"))
 
     val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[HopsSpinnerNode].node
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[NamedNode].node
 
       alphaNumberPicker.setText((selectedNode \ "ALPHA").text.toDouble.toString())
       minutesNumberPicker.setText((selectedNode \ "TIME").text.toDouble.toString())
@@ -839,7 +869,7 @@ class RecipeStats extends FragmentActivity {
     addButton.setOnClickListener((v: View) => {
 
       if (amountNumberPicker.getText().toString != "" && minutesNumberPicker.getText().toString != "") {
-        val hopContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[HopsSpinnerNode].node)
+        val hopContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node)
         val node: NodeSeq = <HOP>{
           (hopContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
             myNode match {
@@ -850,9 +880,9 @@ class RecipeStats extends FragmentActivity {
             }
           })
         }</HOP>
-        val spinnerNode = new HopsSpinnerNode(node.last)
-        currentHops = currentHops ++ spinnerNode.node
-        addHopsToTable(v, spinnerNode)
+        val newNode = node.last
+        currentHops = currentHops ++ newNode
+        addHopsToTable(v, newNode)
         updateBitterness()
       }
       dialog.dismiss()
@@ -861,6 +891,10 @@ class RecipeStats extends FragmentActivity {
     cancelButton.setOnClickListener((v: View) => {
       dialog.dismiss()
     })
+  }
+
+  def prepareHopsDialog(dialog: Dialog, args: Bundle) {
+
   }
 
   def configureMiscDialog(dialog: Dialog) {
@@ -875,17 +909,11 @@ class RecipeStats extends FragmentActivity {
     val useTextView = dialog.findViewById(R.id.miscUseTextView).asInstanceOf[TextView]
 
     val misc = Database.getMisc
-    var nameArray: Array[MiscSpinnerNode] = new Array(misc.length)
-    misc.map { node: Node =>
-      new MiscSpinnerNode(node)
-    }.copyToArray(nameArray)
 
-    var styleArray: ArrayAdapter[MiscSpinnerNode] = new ArrayAdapter[MiscSpinnerNode](this, android.R.layout.simple_spinner_item, nameArray)
-
-    nameSpinner.setAdapter(styleArray)
+    nameSpinner.setAdapter(NodeSeqAdapter.getNodeSeqAdapter(this, misc, "NAME"))
 
     val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[MiscSpinnerNode].node
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[NamedNode].node
 
       timeNumberPicker.setText((selectedNode \ "TIME").text.toDouble.toString())
       typeEditText.setText((selectedNode \ "TYPE").text.toString())
@@ -906,7 +934,7 @@ class RecipeStats extends FragmentActivity {
 
     addButton.setOnClickListener((v: View) => {
       if (amountNumberPicker.getText().toString != "" && timeNumberPicker.getText().toString != "") {
-        val miscContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[MiscSpinnerNode].node)
+        val miscContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node)
         val node: NodeSeq = <MISC>{
           (miscContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
             myNode match {
@@ -917,15 +945,19 @@ class RecipeStats extends FragmentActivity {
             }
           })
         }</MISC>
-        val spinnerNode = new MiscSpinnerNode(node.last)
-        currentMisc = currentMisc ++ spinnerNode.node
-        addMiscToTable(v, spinnerNode)
+        val newNode = node.last
+        currentMisc = currentMisc ++ newNode
+        addMiscToTable(v, newNode)
       }
       dialog.dismiss()
     })
     cancelButton.setOnClickListener((v: View) => {
       dialog.dismiss()
     })
+
+  }
+
+  def prepareMiscDialog(dialog: Dialog, args: Bundle) {
 
   }
 
@@ -942,17 +974,11 @@ class RecipeStats extends FragmentActivity {
     val flocculationTextView = dialog.findViewById(R.id.yeastFlocculationTextView).asInstanceOf[TextView]
 
     val yeast = Database.getYeast
-    var nameArray: Array[YeastSpinnerNode] = new Array(yeast.length)
-    yeast.map { node: Node =>
-      new YeastSpinnerNode(node)
-    }.copyToArray(nameArray)
 
-    var styleArray: ArrayAdapter[YeastSpinnerNode] = new ArrayAdapter[YeastSpinnerNode](this, android.R.layout.simple_spinner_item, nameArray)
-
-    nameSpinner.setAdapter(styleArray)
+    nameSpinner.setAdapter(NodeSeqAdapter.getNodeSeqAdapter(this, yeast, "NAME"))
 
     val nameOnSelectListener: AdapterView.OnItemSelectedListener = createOnItemSelectedListener((av: AdapterView[_], v: View, i: Int, l: Long) => {
-      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[YeastSpinnerNode].node
+      val selectedNode: Node = nameSpinner.getItemAtPosition(i).asInstanceOf[NamedNode].node
 
       formTextView.setText((selectedNode \ "FORM").text.toString())
       laboratoryTextView.setText((selectedNode \ "LABORATORY").text.toString())
@@ -975,7 +1001,7 @@ class RecipeStats extends FragmentActivity {
     addButton.setOnClickListener((v: View) => {
 
       if (amountNumberPicker.getText().toString != "") {
-        val yeastContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[YeastSpinnerNode].node)
+        val yeastContents: NodeSeq = (nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node)
         val node: NodeSeq = <YEAST>{
           (yeastContents \ "_").foldLeft(NodeSeq.Empty)((B: NodeSeq, myNode: Node) => {
             myNode match {
@@ -985,9 +1011,9 @@ class RecipeStats extends FragmentActivity {
             }
           })
         }</YEAST>
-        val spinnerNode = new YeastSpinnerNode(node.last)
-        currentYeast = currentYeast ++ spinnerNode.node
-        addYeastToTable(v, spinnerNode)
+        val newNode = node.last
+        currentYeast = currentYeast ++ newNode
+        addYeastToTable(v, newNode)
         updateGravity()
       }
       dialog.dismiss()
@@ -996,6 +1022,10 @@ class RecipeStats extends FragmentActivity {
     cancelButton.setOnClickListener((v: View) => {
       dialog.dismiss()
     })
+  }
+
+  def prepareYeastDialog(dialog: Dialog, args: Bundle) {
+
   }
 
   class RecipeStyleFragment extends Fragment {
@@ -1057,8 +1087,14 @@ class RecipeStats extends FragmentActivity {
       override def onClick(v: View) = func(v)
     }
   }
+ 
+  implicit def func2OnLongClickListener(func: (View) => Boolean): View.OnLongClickListener = {
+    return new View.OnLongClickListener() {
+      override def onLongClick(v: View) = func(v)
+    }
+  }
 
-  implicit def func2OnTextChangeListner(func: (Editable) => Unit): TextWatcher = {
+  implicit def func2OnTextChangeListener(func: (Editable) => Unit): TextWatcher = {
     class Temp extends TextWatcher {
       override def afterTextChanged(e: Editable) = func(e)
       override def beforeTextChanged(s: CharSequence, a: Int, b: Int, c: Int) = {}
@@ -1076,26 +1112,3 @@ class RecipeStats extends FragmentActivity {
   }
 }
 
-class FermentableSpinnerNode(val node: Node) {
-  override def toString(): String = {
-    ((node \ "NAME").text).toString()
-  }
-}
-
-class HopsSpinnerNode(val node: Node) {
-  override def toString(): String = {
-    ((node \ "NAME").text).toString()
-  }
-}
-
-class MiscSpinnerNode(val node: Node) {
-  override def toString(): String = {
-    ((node \ "NAME").text).toString()
-  }
-}
-
-class YeastSpinnerNode(val node: Node) {
-  override def toString(): String = {
-    ((node \ "NAME").text).toString()
-  }
-}
