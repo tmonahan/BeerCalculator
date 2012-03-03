@@ -589,7 +589,14 @@ class RecipeStats extends FragmentActivity {
 
     tr.setLongClickable(true)
     tr.setOnLongClickListener((v: View) => {
-      showDialog(FERMENTABLE_DIALOG)
+      var bundle = new Bundle();
+      bundle.putString("NAME", ((node \ "NAME").text).toString)
+      bundle.putString("OK_STR", "Save Fermentable")
+      bundle.putString("CANCEL_STR", "Delete Fermentable")
+      bundle.putDouble("YIELD", ((node \ "YIELD").text.toDouble))
+      bundle.putDouble("COLOR", ((node \ "COLOR").text.toDouble))
+      bundle.putDouble("AMOUNT", ((node \ "AMOUNT").text.toDouble))
+      showDialog(FERMENTABLE_DIALOG, bundle)
       fermentableTable.removeView(tr)
       currentFermentables = removeNode(currentFermentables, node);
       updateAll();
@@ -818,6 +825,10 @@ class RecipeStats extends FragmentActivity {
   }
 
   def prepareFermentableDialog(dialog: Dialog, args: Bundle) {
+    val ok_default = "Add Fermentable"
+    val cancel_default = "Cancel"
+    val name_default = ""
+
     var myArgs = args
     if(myArgs == null) {
       myArgs = new Bundle()
@@ -827,8 +838,23 @@ class RecipeStats extends FragmentActivity {
     val colorNumberPicker = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
     val notesTextView = dialog.findViewById(R.id.fermentableNotesTextView).asInstanceOf[TextView]
     val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[EditText]
+    val addButton = dialog.findViewById(R.id.fermentableAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.fermentableCancelButton).asInstanceOf[Button]
 
 
+    val nameIndex = NodeSeqAdapter.getPositionFromNodeName(nameSpinner.getAdapter.asInstanceOf[ArrayAdapter[NamedNode]], getStringOrElse(myArgs, "NAME", name_default))
+
+    nameSpinner.setSelection(nameIndex.getOrElse(0), false) //Do not animate this time
+    val selectedNode = nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node
+
+    amountTextView.setText("%.2f".format(Calculation.convertKgLbs(myArgs.getDouble("AMOUNT", 0.0))))
+    yieldNumberPicker.setText("%.1f".format(
+        myArgs.getDouble("YIELD", (selectedNode \ "YIELD").text.toDouble)))
+    colorNumberPicker.setText("%.1f".format(
+        myArgs.getDouble("COLOR", (selectedNode \ "COLOR").text.toDouble)))
+
+    addButton.setText(getStringOrElse(myArgs, "OK_STR", ok_default))
+    cancelButton.setText(getStringOrElse(myArgs, "CANCEL_STR", cancel_default))
   }
 
   def configureHopsDialog(dialog: Dialog) {
@@ -1109,6 +1135,14 @@ class RecipeStats extends FragmentActivity {
 
       override def onNothingSelected(av: AdapterView[_]) = f(av)
     }
+  }
+
+  def getStringOrElse(arg: Bundle, str: String, default: String):String = {
+    val result = arg.getString(str)
+    if(result == null)
+      default
+    else
+      result
   }
 }
 

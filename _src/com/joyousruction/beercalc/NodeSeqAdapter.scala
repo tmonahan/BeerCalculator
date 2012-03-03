@@ -17,7 +17,7 @@ object NodeSeqAdapter {
 
   def getPositionFromNodeName(adapter: ArrayAdapter[NamedNode], name: String): Option[Int] = {
     var position = -1
-    for(i <- 0 to adapter.getCount()){
+    for(i <- 0 to adapter.getCount() - 1){
       if(adapter.getItem(i).toString.equals(name))
         position = i
     }
