@@ -639,6 +639,22 @@ class RecipeStats extends FragmentActivity {
     tr.addView(amountText)
     tr.addView(deleteButton("Delete", () => { currentHops = removeNode(currentHops, node); updateBitterness() }))
 
+    tr.setLongClickable(true)
+    tr.setOnLongClickListener((v: View) => {
+      var bundle = new Bundle();
+      bundle.putString("NAME", ((node \ "NAME").text).toString)
+      bundle.putString("OK_STR", "Save Fermentable")
+      bundle.putString("CANCEL_STR", "Delete Fermentable")
+      bundle.putDouble("ALPHA", ((node \ "ALPHA").text.toDouble))
+      bundle.putDouble("TIME", ((node \ "TIME").text.toDouble))
+      bundle.putDouble("AMOUNT", ((node \ "AMOUNT").text.toDouble))
+      showDialog(HOPS_DIALOG, bundle)
+      hopsTable.removeView(tr)
+      currentHops = removeNode(currentHops, node);
+      updateAll();
+      true
+    })
+
     var index = 1
     for (i <- 1 until hopsTable.getChildCount()) {
       var currentTime = hopsTable.getChildAt(i).asInstanceOf[TableRow].getChildAt(1).asInstanceOf[TextView].getText().toString.toDouble
@@ -682,6 +698,21 @@ class RecipeStats extends FragmentActivity {
     tr.addView(amountText)
     tr.addView(deleteButton("Delete", () => { currentMisc = removeNode(currentMisc, node) }))
 
+    tr.setLongClickable(true)
+    tr.setOnLongClickListener((v: View) => {
+      var bundle = new Bundle();
+      bundle.putString("NAME", ((node \ "NAME").text).toString)
+      bundle.putString("OK_STR", "Save Misc")
+      bundle.putString("CANCEL_STR", "Delete Misc")
+      bundle.putDouble("TIME", ((node \ "TIME").text.toDouble))
+      bundle.putDouble("AMOUNT", ((node \ "AMOUNT").text.toDouble))
+      showDialog(MISC_DIALOG, bundle)
+      miscTable.removeView(tr)
+      currentMisc = removeNode(currentMisc, node);
+      updateAll();
+      true
+    })
+
     miscTable.addView(tr, new TableLayout.LayoutParams(
       MATCH_PARENT,
       WRAP_CONTENT))
@@ -704,6 +735,21 @@ class RecipeStats extends FragmentActivity {
     tr.addView(text)
     tr.addView(amountText)
     tr.addView(deleteButton("Delete", () => { currentYeast = removeNode(currentYeast, node) }))
+
+    tr.setLongClickable(true)
+    tr.setOnLongClickListener((v: View) => {
+      var bundle = new Bundle();
+      bundle.putString("NAME", ((node \ "NAME").text).toString)
+      bundle.putString("OK_STR", "Save Yeast")
+      bundle.putString("CANCEL_STR", "Delete Yeast")
+      bundle.putDouble("ATTENUATION", ((node \ "ATTENUATION").text.toDouble))
+      bundle.putDouble("AMOUNT", ((node \ "AMOUNT").text.toDouble))
+      showDialog(YEAST_DIALOG, bundle)
+      yeastTable.removeView(tr)
+      currentYeast = removeNode(currentYeast, node);
+      updateAll();
+      true
+    })
 
     yeastTable.addView(tr, new TableLayout.LayoutParams(
       MATCH_PARENT,
@@ -836,7 +882,6 @@ class RecipeStats extends FragmentActivity {
     val nameSpinner = dialog.findViewById(R.id.fermentableNameSpinner).asInstanceOf[Spinner]
     val yieldNumberPicker = dialog.findViewById(R.id.fermentableYeildNumberPicker).asInstanceOf[EditText]
     val colorNumberPicker = dialog.findViewById(R.id.fermentableColorNumberPicker).asInstanceOf[EditText]
-    val notesTextView = dialog.findViewById(R.id.fermentableNotesTextView).asInstanceOf[TextView]
     val amountTextView = dialog.findViewById(R.id.fermentableAmountNumberPicker).asInstanceOf[EditText]
     val addButton = dialog.findViewById(R.id.fermentableAddItemButton).asInstanceOf[Button]
     val cancelButton = dialog.findViewById(R.id.fermentableCancelButton).asInstanceOf[Button]
@@ -920,7 +965,35 @@ class RecipeStats extends FragmentActivity {
   }
 
   def prepareHopsDialog(dialog: Dialog, args: Bundle) {
+    val ok_default = "Add Hops"
+    val cancel_default = "Cancel"
+    val name_default = ""
 
+    var myArgs = args
+    if(myArgs == null) {
+      myArgs = new Bundle()
+    }
+    val nameSpinner = dialog.findViewById(R.id.hopsNameSpinner).asInstanceOf[Spinner]
+    lazy val alphaNumberPicker = dialog.findViewById(R.id.hopsAlphaNumberPicker).asInstanceOf[EditText]
+    lazy val minutesNumberPicker = dialog.findViewById(R.id.hopsMinutesNumberPicker).asInstanceOf[EditText]
+    lazy val amountNumberPicker = dialog.findViewById(R.id.hopsAmountNumberPicker).asInstanceOf[EditText]
+    val addButton = dialog.findViewById(R.id.hopsAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.hopsCancelButton).asInstanceOf[Button]
+
+
+    val nameIndex = NodeSeqAdapter.getPositionFromNodeName(nameSpinner.getAdapter.asInstanceOf[ArrayAdapter[NamedNode]], getStringOrElse(myArgs, "NAME", name_default))
+
+    nameSpinner.setSelection(nameIndex.getOrElse(0), false) //Do not animate this time
+    val selectedNode = nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node
+
+    amountNumberPicker.setText("%.2f".format(Calculation.convertGOz(myArgs.getDouble("AMOUNT", 0.0) * 1000)))
+    alphaNumberPicker.setText("%.1f".format(
+        myArgs.getDouble("ALPHA", (selectedNode \ "ALPHA").text.toDouble)))
+    minutesNumberPicker.setText("%.1f".format(
+        myArgs.getDouble("TIME", (selectedNode \ "TIME").text.toDouble)))
+
+    addButton.setText(getStringOrElse(myArgs, "OK_STR", ok_default))
+    cancelButton.setText(getStringOrElse(myArgs, "CANCEL_STR", cancel_default))
   }
 
   def configureMiscDialog(dialog: Dialog) {
@@ -984,7 +1057,32 @@ class RecipeStats extends FragmentActivity {
   }
 
   def prepareMiscDialog(dialog: Dialog, args: Bundle) {
+    val ok_default = "Add Misc"
+    val cancel_default = "Cancel"
+    val name_default = ""
 
+    var myArgs = args
+    if(myArgs == null) {
+      myArgs = new Bundle()
+    }
+    val nameSpinner = dialog.findViewById(R.id.miscNameSpinner).asInstanceOf[Spinner]
+    lazy val amountNumberPicker = dialog.findViewById(R.id.miscAmountNumberPicker).asInstanceOf[EditText]
+    lazy val timeNumberPicker = dialog.findViewById(R.id.miscTimeNumberPicker).asInstanceOf[EditText]
+    val addButton = dialog.findViewById(R.id.miscAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.miscCancelButton).asInstanceOf[Button]
+
+
+    val nameIndex = NodeSeqAdapter.getPositionFromNodeName(nameSpinner.getAdapter.asInstanceOf[ArrayAdapter[NamedNode]], getStringOrElse(myArgs, "NAME", name_default))
+
+    nameSpinner.setSelection(nameIndex.getOrElse(0), false) //Do not animate this time
+    val selectedNode = nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node
+
+    amountNumberPicker.setText("%.2f".format(myArgs.getDouble("AMOUNT", 0.0)))
+    timeNumberPicker.setText("%.1f".format(
+        myArgs.getDouble("TIME", (selectedNode \ "TIME").text.toDouble)))
+
+    addButton.setText(getStringOrElse(myArgs, "OK_STR", ok_default))
+    cancelButton.setText(getStringOrElse(myArgs, "CANCEL_STR", cancel_default))
   }
 
   def configureYeastDialog(dialog: Dialog) {
@@ -1051,7 +1149,32 @@ class RecipeStats extends FragmentActivity {
   }
 
   def prepareYeastDialog(dialog: Dialog, args: Bundle) {
+    val ok_default = "Add Misc"
+    val cancel_default = "Cancel"
+    val name_default = ""
 
+    var myArgs = args
+    if(myArgs == null) {
+      myArgs = new Bundle()
+    }
+    val nameSpinner = dialog.findViewById(R.id.yeastNameSpinner).asInstanceOf[Spinner]
+    lazy val amountNumberPicker = dialog.findViewById(R.id.yeastAmountNumberPicker).asInstanceOf[EditText]
+    lazy val attenuationNumberPicker = dialog.findViewById(R.id.yeastAttenuationNumberPicker).asInstanceOf[EditText]
+    val addButton = dialog.findViewById(R.id.yeastAddItemButton).asInstanceOf[Button]
+    val cancelButton = dialog.findViewById(R.id.yeastCancelButton).asInstanceOf[Button]
+
+
+    val nameIndex = NodeSeqAdapter.getPositionFromNodeName(nameSpinner.getAdapter.asInstanceOf[ArrayAdapter[NamedNode]], getStringOrElse(myArgs, "NAME", name_default))
+
+    nameSpinner.setSelection(nameIndex.getOrElse(0), false) //Do not animate this time
+    val selectedNode = nameSpinner.getSelectedItem().asInstanceOf[NamedNode].node
+
+    amountNumberPicker.setText("%.2f".format(myArgs.getDouble("AMOUNT", 0.0)))
+    attenuationNumberPicker.setText("%.1f".format(
+        myArgs.getDouble("ATTENUATION", (selectedNode \ "ATTENUATION").text.toDouble)))
+
+    addButton.setText(getStringOrElse(myArgs, "OK_STR", ok_default))
+    cancelButton.setText(getStringOrElse(myArgs, "CANCEL_STR", cancel_default))
   }
 
   class RecipeStyleFragment extends Fragment {
