@@ -2,7 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center|center_horizontal|fill_horizontal|right"
     android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="fill_horizontal" >
+
+
+        <Button
+            android:id="@+id/recipeSettingsButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Settings" />
+        
+        <Button
+            android:id="@+id/recipeStyleButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="Style Info" />
+
+        <TextView
+            android:id="@+id/settingsTextView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Ingredients"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/recipeNameTextView"
@@ -10,7 +45,7 @@
         android:layout_height="wrap_content"
         android:text="Name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
+    
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"

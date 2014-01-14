@@ -84,6 +84,13 @@ class RecipeStats extends FragmentActivity {
   //recipe fragment buttons etc
   var recipeName: TextView = null
 
+  var recipeSettingsButton: Button = null
+  var recipeStyleButton: Button = null
+  var settingsRecipeButton: Button = null
+  var settingsStyleButton: Button = null
+  var styleRecipeButton: Button = null
+  var styleSettingsButton: Button = null
+
   var fermentablesAddButton: Button = null
   var fermentableTable: TableLayout = null
 
@@ -202,6 +209,9 @@ class RecipeStats extends FragmentActivity {
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
       val v: View = inflater.inflate(R.layout.recipesettings, container, false)
 
+      settingsRecipeButton = v.findViewById(R.id.settingsRecipeButton).asInstanceOf[Button]
+      settingsStyleButton = v.findViewById(R.id.settingsStyleButton).asInstanceOf[Button]
+
       lazy val beerNameText = v.findViewById(R.id.beerNameEditText).asInstanceOf[EditText]
       lazy val brewerNameText = v.findViewById(R.id.brewerNameEditText).asInstanceOf[EditText]
       lazy val batchText = v.findViewById(R.id.calculatedBatchSizeTextView).asInstanceOf[TextView]
@@ -241,6 +251,15 @@ class RecipeStats extends FragmentActivity {
       } catch {
         case e: Exception => {}
       }
+
+      settingsRecipeButton.setOnClickListener((v: View) => {
+        mPager.setCurrentItem(RECIPE_FORMULATION, false)
+      })
+
+      settingsStyleButton.setOnClickListener((v: View) => {
+        mPager.setCurrentItem(RECIPE_STYLE, false)
+      })
+
 
       beerNameText.addTextChangedListener((e: Editable) => {
         if (beerNameText.isInputMethodTarget()) {
@@ -348,6 +367,9 @@ class RecipeStats extends FragmentActivity {
 
       recipeName = v.findViewById(R.id.recipeNameTextView).asInstanceOf[TextView]
 
+      recipeSettingsButton = v.findViewById(R.id.recipeSettingsButton).asInstanceOf[Button]
+      recipeStyleButton = v.findViewById(R.id.recipeStyleButton).asInstanceOf[Button]
+
       fermentablesAddButton = v.findViewById(R.id.fermentablesAddButton).asInstanceOf[Button]
       fermentableTable = v.findViewById(R.id.fermentableTable).asInstanceOf[TableLayout]
 
@@ -371,6 +393,14 @@ class RecipeStats extends FragmentActivity {
       bitternessUnitsValue = v.findViewById(R.id.buValue).asInstanceOf[TextView]
       bitternessGravityValue = v.findViewById(R.id.buguValue).asInstanceOf[TextView]
       colorValue = v.findViewById(R.id.colorValue).asInstanceOf[TextView]
+
+      recipeSettingsButton.setOnClickListener((v: View) => {
+        mPager.setCurrentItem(RECIPE_SETTINGS, false)
+      })
+
+      recipeStyleButton.setOnClickListener((v: View) => {
+        mPager.setCurrentItem(RECIPE_STYLE, false)
+      })
 
       fermentablesAddButton.setOnClickListener((v: View) => {
         showDialog(FERMENTABLE_DIALOG)
@@ -1186,6 +1216,9 @@ class RecipeStats extends FragmentActivity {
     override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
       val v: View = inflater.inflate(R.layout.recipestyle, container, false)
 
+      styleRecipeButton = v.findViewById(R.id.styleRecipeButton).asInstanceOf[Button]
+      styleSettingsButton = v.findViewById(R.id.styleSettingsButton).asInstanceOf[Button]
+
       lazy val nameText = v.findViewById(R.id.nameStyleText).asInstanceOf[TextView]
       lazy val notesText = v.findViewById(R.id.notesStyleText).asInstanceOf[TextView]
       lazy val profileText = v.findViewById(R.id.profileStyleText).asInstanceOf[TextView]
@@ -1226,6 +1259,14 @@ class RecipeStats extends FragmentActivity {
       } catch {
         case e: Exception => {}
       }
+
+      styleRecipeButton.setOnClickListener((v: View) => {
+        mPager.setCurrentItem(RECIPE_FORMULATION, false)
+      })
+
+      styleSettingsButton.setOnClickListener((v: View) => {
+        mPager.setCurrentItem(RECIPE_SETTINGS, false)
+      })
 
       v
     }

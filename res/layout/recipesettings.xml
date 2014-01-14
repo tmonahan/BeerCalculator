@@ -3,7 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="fill_horizontal" >
 
+        <Button
+            android:id="@+id/settingsRecipeButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="Ingredients" />
+
+        <Button
+            android:id="@+id/settingsStyleButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Style Info" />
+
+        <TextView
+            android:id="@+id/settingsTextView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Settings"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </RelativeLayout>
+    
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

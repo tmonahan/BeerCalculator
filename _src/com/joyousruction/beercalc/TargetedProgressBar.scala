@@ -66,7 +66,7 @@ final class TargetedProgressBar(context: Context, attrs: AttributeSet, defStyle:
   }
   override def setProgress(newProgress: Int) {
     if(newProgress >= minTargetProgress && newProgress <= maxTargetProgress) {
-      this.getProgressDrawable().asInstanceOf[LayerDrawable].getDrawable(2).setColorFilter(0xFF10FFFF.toInt, android.graphics.PorterDuff.Mode.MULTIPLY)
+      this.getProgressDrawable().asInstanceOf[LayerDrawable].getDrawable(2).setColorFilter(0xFF10FF10.toInt, android.graphics.PorterDuff.Mode.MULTIPLY)
     } else {
       this.getProgressDrawable().asInstanceOf[LayerDrawable].getDrawable(2).setColorFilter(null)
     }
