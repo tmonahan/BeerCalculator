@@ -146,4 +146,10 @@ object Calculation {
   def setSugarLoss(newSugarLoss_percent: Double) {
     sugarLoss_percent = newSugarLoss_percent
   }
+
+  // Found equation from Ritchie Products Ltd, (Zymurgy, Summer 1995, vol. 18, no. 2) -Michael L. Hall’s article Brew by the Numbers: Add Up What’s in Your Beer, and Designing Great Beers by Daniels.
+  // on the http://www.brewersfriend.com website
+  def getABV(og: Double, fg: Double): Double = {
+    (76.08 * (og-fg) / (1.775-og)) * (fg / 0.794)
+  }
 }

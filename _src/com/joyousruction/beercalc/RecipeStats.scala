@@ -56,6 +56,7 @@ class RecipeStats extends FragmentActivity {
   var boil_gravity = 1.000
   var batch_gravity = 1.000
   var fg = 1.000
+  var abv = 0.0
   var bitterness_ibu = 0.0
   var color_srm = 0.0
   var estimatedAttenuation = 0.0
@@ -76,7 +77,6 @@ class RecipeStats extends FragmentActivity {
   var finalGravity = 1.000
   var ibu = 0.0
   var color = 0.0
-  var abv = 0.0
   var carbonation = 0.0
 
   var maxHopBoilTime = 0.0
@@ -106,14 +106,14 @@ class RecipeStats extends FragmentActivity {
   var originalGravityTPB: TargetedProgressBar = null
   var finalGravityTPB: TargetedProgressBar = null
   var bitternessUnitsTPB: TargetedProgressBar = null
-  var bitternessGravityTPB: TargetedProgressBar = null
+  var abvTPB: TargetedProgressBar = null
   var colorTPB: TargetedProgressBar = null
 
   var originalGravityValue: TextView = null
   var finalGravityValue: TextView = null
 
   var bitternessUnitsValue: TextView = null
-  var bitternessGravityValue: TextView = null
+  var abvValue: TextView = null
   var colorValue: TextView = null
 
   //create the main page
@@ -385,13 +385,13 @@ class RecipeStats extends FragmentActivity {
       originalGravityTPB = v.findViewById(R.id.ogTargetedProgressBar).asInstanceOf[TargetedProgressBar]
       finalGravityTPB = v.findViewById(R.id.fgTargetedProgressBar).asInstanceOf[TargetedProgressBar]
       bitternessUnitsTPB = v.findViewById(R.id.buTargetedProgressBar).asInstanceOf[TargetedProgressBar]
-      bitternessGravityTPB = v.findViewById(R.id.buguTargetedProgressBar).asInstanceOf[TargetedProgressBar]
+      abvTPB = v.findViewById(R.id.abvTargetedProgressBar).asInstanceOf[TargetedProgressBar]
       colorTPB = v.findViewById(R.id.colorTargetedProgressBar).asInstanceOf[TargetedProgressBar]
 
       originalGravityValue = v.findViewById(R.id.ogValue).asInstanceOf[TextView]
       finalGravityValue = v.findViewById(R.id.fgValue).asInstanceOf[TextView]
       bitternessUnitsValue = v.findViewById(R.id.buValue).asInstanceOf[TextView]
-      bitternessGravityValue = v.findViewById(R.id.buguValue).asInstanceOf[TextView]
+      abvValue = v.findViewById(R.id.abvValue).asInstanceOf[TextView]
       colorValue = v.findViewById(R.id.colorValue).asInstanceOf[TextView]
 
       recipeSettingsButton.setOnClickListener((v: View) => {
@@ -466,6 +466,9 @@ class RecipeStats extends FragmentActivity {
 
       var minABV = getValue("ABV_MIN", 10.0f, 0, 0)
       var maxABV = getValue("ABV_MAX", 10.0f, 0, 30)
+      abvTPB.setMax(150)
+      abvTPB.setMaxTargetProgress(maxABV)
+      abvTPB.setMinTargetProgress(minABV)
 
       var minCarbonation = getValue("CARB_MIN", 10.0f, 0, 0)
       var maxCarbonation = getValue("CARB_MAX", 10.0f, 0, 50)
@@ -581,11 +584,14 @@ class RecipeStats extends FragmentActivity {
     boil_gravity = (batch_liters / boil_liters) * (batch_gravity - 1.0) + 1.0
     estimatedAttenuation = Calculation.getAttenuationFromYeast(currentYeast)
     fg = (batch_gravity - 1.0) * (1.0 - (estimatedAttenuation / 100.0)) + 1.0
+    abv = Calculation.getABV(batch_gravity, fg)
 
     originalGravityTPB.setProgress(((batch_gravity - 1.0) * 1000).toInt)
     originalGravityValue.setText("%.3f".format(batch_gravity))
     finalGravityTPB.setProgress(((fg - 1.0) * 1000).toInt)
     finalGravityValue.setText("%.3f".format(fg))
+    abvTPB.setProgress((abv * 10).toInt)
+    abvValue.setText("%.1f".format(abv))
   }
 
   private def updateBitterness() = {

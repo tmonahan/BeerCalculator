@@ -14,18 +14,18 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
+        public static final int abvName=0x7f060052;
         public static final int abvStyleMax=0x7f060081;
         public static final int abvStyleMin=0x7f060080;
         public static final int abvStyleName=0x7f06007f;
+        public static final int abvTargetedProgressBar=0x7f060054;
+        public static final int abvValue=0x7f060053;
         public static final int addButton=0x7f060096;
         public static final int beerNameEditText=0x7f06005b;
         public static final int brewerNameEditText=0x7f06005c;
         public static final int buName=0x7f06004e;
         public static final int buTargetedProgressBar=0x7f060050;
         public static final int buValue=0x7f06004f;
-        public static final int buguName=0x7f060052;
-        public static final int buguTargetedProgressBar=0x7f060054;
-        public static final int buguValue=0x7f060053;
         public static final int calculatedBatchSizeTextView=0x7f06005e;
         public static final int calculatedBoilSizeTextView=0x7f060060;
         public static final int calculatedEfficiencySizeTextView=0x7f060063;
