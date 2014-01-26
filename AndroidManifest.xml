@@ -35,7 +35,7 @@
             android:name=".StartNewRecipe"
             android:screenOrientation="unspecified" >
         </activity>
-        <activity android:name=".Timer" >
+        <activity android:name=".BoilActivity" >
         </activity>
         <activity
             android:name=".RecipeStats"

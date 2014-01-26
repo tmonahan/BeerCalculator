@@ -3,6 +3,7 @@ package com.joyousruction.beercalc
 import scala.xml.{ Elem, Node, NodeSeq, XML }
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -170,9 +171,13 @@ class RecipeStats extends FragmentActivity {
         Database.saveCurrentRecipe(this)
         true
       }
+      case R.id.brew => {
+        updateDatabaseRecipe()
+        startActivity(new Intent(RecipeStats.this, classOf[BoilActivity]))
+        true
+      }
       case _ => { super.onOptionsItemSelected(item) }
     }
-
   }
 
   def refreshAllViews() {

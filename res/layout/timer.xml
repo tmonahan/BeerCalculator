@@ -3,7 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="fill_horizontal" >
 
+        <Button
+            android:id="@+id/timerSettingsButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Boil Settings" />
+        
+        <Button
+            android:id="@+id/timerHistoryButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="Boil History" />
+
+        <TextView
+            android:id="@+id/timerTextView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Boil Timer"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </RelativeLayout>
+    
     <TextView
         android:id="@+id/overallTimeText"
         android:layout_width="wrap_content"
